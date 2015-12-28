@@ -1,0 +1,65 @@
+<div class="block double-padded" id="s-generator-form">
+
+    <h1>[`Products generator`]</h1>
+
+    <form action="?plugin=generator&module=run" id="s-plugin-generator" method="post">
+        <div class="fields form">
+
+            <div class="field js-profile-description">
+                <div class="name">Название профиля</div>
+                <div class="value">
+                    <input type="text" name="profile[name]" value="{$profile.name|escape}">
+                    <input name="profile[id]" type="hidden" value="{$profile.id|default:-1}">
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name">URL файла источника</div>
+                <div class="value">
+                    <input type="text" name="config[src_url]" value="{$profile.config.src_url}" class="long">
+                </div>
+            </div>
+
+            <div class="field-group" id="plugin-generator-submit">
+                <div class="field">
+                    <div class="value submit">
+                        <button type="submit" class="button green">Запуск</button>
+                        <br><br>
+                        <em class="small js-profile-notice">При запуске настройки профиля будут сохранены</em>
+
+                        <div class="js-progressbar-container" style="display:none">
+                            <div class="progressbar blue float-left" style="display:none;width:70%">
+                                <div class="progressbar-outer">
+                                    <div class="progressbar-inner" style="width:0"></div>
+                                </div>
+                            </div>
+                            <img src="{$wa_url}wa-content/img/loading32.gif" alt="Loading" style="float:left;margin-top:8px">
+                            <div class="clear"></div>
+                            <span class="progressbar-description"></span>
+                            <br style="clear:left"><br>
+                            <span class="small italic">
+                                Не закрывайте окно браузера и не покидайте страницу до тех пор, пока процесс не будет завершен
+                            </span>
+                        </div>
+                        <br><br>
+                        <em class="errormsg"></em>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-group" id="plugin-generator-report" style="display: none">
+                <div class="field">
+                    <div class="value"></div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+<script type="text/javascript">
+    if($.importexport.plugins.generator) $.importexport.plugins.generator.init();
+    else $.getScript('{$wa_app_static_url}plugins/generator/js/generator.js', function(){ $.importexport.plugins.generator.init() });
+    $.importexport.profiles.set('generator', {$profiles|json_encode});
+</script>

@@ -40,6 +40,12 @@ $.extend($.importexport.plugins, {
             return false;
         },
 
+        select: function(e, category_id) {
+            var name = $(e).find('span.name').text();
+            $('#s-plugin-generator-cat').val(name);
+            $('#s-plugin-generator-catid').val(category_id);
+        },
+
         generatorHandler: function (elm) {
             var self = this;
             self.progress = true;

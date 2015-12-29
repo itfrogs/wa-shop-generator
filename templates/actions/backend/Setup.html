@@ -4,29 +4,40 @@
 
     <form action="?plugin=generator&module=run" id="s-plugin-generator" method="post">
         <div class="fields form">
-
-            <div class="field js-profile-description">
-                <div class="name">Название профиля</div>
-                <div class="value">
-                    <input type="text" name="profile[name]" value="{$profile.name|escape}">
-                    <input name="profile[id]" type="hidden" value="{$profile.id|default:-1}">
-                </div>
-            </div>
-
             <div class="field">
-                <div class="name">URL файла источника</div>
+                <div class="name">[`Category for generating products`]</div>
                 <div class="value">
-                    <input type="text" name="config[src_url]" value="{$profile.config.src_url}" class="long">
+                    <input id="s-plugin-generator-cat"  class="long" type="text" readonly="readonly" value="[`Select a category`]">
+                </div>
+                <input id="s-plugin-generator-catid" type="hidden" name="config[category_id]" value="0">
+            </div>
+            <div class="field">
+                <div class="name">[`Prefix the name of the product`]</div>
+                <div class="value">
+                    <input class="long" type="text" name="config[prefix]" value="[`Product`]">
                 </div>
             </div>
+            <div class="field">
+                <div class="name">[`Number of products generated`]</div>
+                <div class="value">
+                    <input class="long" type="text" name="config[num]" value="0">
+                </div>
+            </div>
+
+
+            <!-- categories -->
+            <div class="block drop-target" id="s-category-list-block">
+                <div class="hierarchical s-collection-list" id="s-category-list">
+                    {include './include.categories.html' categories=$categories->getList() inline}
+                </div>
+            </div>
+
 
             <div class="field-group" id="plugin-generator-submit">
                 <div class="field">
                     <div class="value submit">
-                        <button type="submit" class="button green">Запуск</button>
+                        <button type="submit" class="button green">[`Start`]</button>
                         <br><br>
-                        <em class="small js-profile-notice">При запуске настройки профиля будут сохранены</em>
-
                         <div class="js-progressbar-container" style="display:none">
                             <div class="progressbar blue float-left" style="display:none;width:70%">
                                 <div class="progressbar-outer">

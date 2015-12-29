@@ -35,11 +35,13 @@ class shopGeneratorPluginRunController extends waLongActionController
             $options = waRequest::post();
             $options['processId'] = $this->processId;
 
-            $Profile = new shopImportexportHelper('generator');
+
 
             if ($reader_id = waRequest::post('reader')) {
                 unset($options['reader']);
             }
+
+            //todo: я тут ридер удалил, его надо посмотреть в основном плагине т.к. на него все завязано
 
             $this->data['reader'] = $this->getReader($reader_id, $options['config']);
 
@@ -64,7 +66,6 @@ class shopGeneratorPluginRunController extends waLongActionController
             $this->data['stage'] = reset($stages);
             $this->data['stage_name'] = $this->getStageName($this->data['stage']);
 
-            $Profile->setConfig($options['config'] + array('reader'=>$reader_id));
 
         } catch (waException $e) {
             echo json_encode(array('error' => $e->getMessage()));

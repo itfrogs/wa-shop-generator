@@ -70,7 +70,10 @@
 
 </div>
 <script type="text/javascript">
-    if($.importexport.plugins.generator) $.importexport.plugins.generator.init();
-    else $.getScript('{$wa_app_static_url}plugins/generator/js/generator.js', function(){ $.importexport.plugins.generator.init() });
-    $.importexport.profiles.set('generator', {$profiles|json_encode});
+    if($.importexport.plugins.generator) {
+        $.importexport.plugins.generator.init();
+    }
+    else {
+        $.getScript('{$wa_app_static_url}plugins/generator/js/generator.js', function(){ $.importexport.plugins.generator.init() });
+    }
 </script>

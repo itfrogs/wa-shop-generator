@@ -8,7 +8,7 @@ return array(
     'version'           => '1.0.0',
     'importexport'      => 1,//'profiles',
     'import_profile'    => false,
-    'shop_settings'     => TRUE,
+    //'shop_settings'     => TRUE,
     'handlers'          =>
         array(),
 );

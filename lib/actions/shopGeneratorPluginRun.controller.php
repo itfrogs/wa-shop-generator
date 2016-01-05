@@ -101,6 +101,7 @@ class shopGeneratorPluginRunController extends waLongActionController
          * @property int|null $count
          * @property int $category_id
          */
+        $price = rand(100, 10000);
         $data = array(
             'name' => $this->data['prefix'],
             'summary' => $this->lipsum_short,
@@ -110,20 +111,32 @@ class shopGeneratorPluginRunController extends waLongActionController
             'contact' => wa()->getUser(),
             'status' => 1,
             'url' => shopHelper::genUniqueUrl($this->data['prefix'], new shopProductModel(), $this->data['processed_count']),
-            'price' => rand(100, 10000),
+            'price' => $price,
             'count' => null,
             'currency' => $this->config->getCurrency(true),
         );
-        $product = new shopProduct($data);
+        $product = new shopProduct();
         $product->save($data);
 
         $data['name'] = $this->data['prefix'].' (' . $product->getId() . ')';
+        $data['price'] = $price;
+        $data['min_price'] = $price;
+        $data['max_price'] = $price;
         $product->name = $data['name'];
-        $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'], new shopProductModel(), $product->getId());
+        $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel(), $product->getId());
         $product->url = $data['url'];
+
+        //$image = new shopImage()
+
         $product->save($data);
 
-        waLog::log(print_r($product, true), 'product.log');
+        $sku_model = new shopProductSkusModel();
+        $sku = $sku_model->getById($product->sku_id);
+        $sku['price'] = $price;
+        $sku['primary_price'] = $price;
+        $sku['available'] = 1;
+        $sku_model->updateById($sku['id'], $sku);
+//        waLog::log(print_r($product, true), 'product.log');
 
         return !$this->isDone();
     }

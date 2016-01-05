@@ -97,11 +97,6 @@ class shopGeneratorPluginRunController extends waLongActionController
          */
         $config = $this->getConfig();
 
-        $this->data['memory'] = memory_get_peak_usage();
-        $this->data['memory_avg'] = memory_get_usage();
-        $this->data['current'] = $this->data['current'] - 1;
-        $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
-
         $price = rand(100, 10000);
         $data = array(
             'name' => $this->data['prefix'],
@@ -110,11 +105,16 @@ class shopGeneratorPluginRunController extends waLongActionController
             'contact_id' => wa()->getUser()->getId(),
             'contact' => wa()->getUser(),
             'status' => 1,
-            'url' => shopHelper::genUniqueUrl($this->data['prefix'], new shopProductModel()),
+            'url' => shopHelper::genUniqueUrl($this->data['prefix'].time().rand(1,1000), new shopProductModel()),
             'price' => $price,
             'count' => null,
             'currency' => $this->config->getCurrency(true),
         );
+
+        $raw_img = file_get_contents('http://robohash.itfrogs.ru/'.$data['url'].'&size='.$settings['image_width'].'x'.$settings['image_height']);
+        $tmp_path = wa()->getDataPath('data/generator/image.png', true, 'shop', true);
+        file_put_contents($tmp_path, $raw_img);
+
         $product = new shopProduct();
         $product->save($data);
 
@@ -127,14 +127,23 @@ class shopGeneratorPluginRunController extends waLongActionController
         $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel());
         $product->url = $data['url'];
 
-        $raw_img = file_get_contents('http://robohash.itfrogs.ru/'.$data['url'].'&size='.$settings['image_width'].'x'.$settings['image_height']);
-        $tmp_path = wa()->getDataPath('data/generator/image.png', true, 'shop', true);
-        file_put_contents($tmp_path, $raw_img);
-        //$file = waFiles::
         $image = waImage::factory($tmp_path);
-        //$image->save();
 
-        $pim = new shopProductImagesModel();
+        waLog::log(print_r($product->getId(), true), 'images.log');
+        waLog::log(print_r($image, true), 'images.log');
+
+        if (!file_exists($tmp_path) || !$image) {
+            $spm = new shopProductModel();
+            $spm->deleteById($product->getId());
+            return !$this->isDone();
+        }
+        else {
+            $this->data['memory'] = memory_get_peak_usage();
+            $this->data['memory_avg'] = memory_get_usage();
+            $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
+            $this->data['current'] = $this->data['current'] - 1;
+        }
+
         $img = array(
             'product_id'        => $product->getId(),
             'upload_datetime'   => date('Y-m-d H:i:s'),
@@ -146,15 +155,10 @@ class shopGeneratorPluginRunController extends waLongActionController
             'ext'               => 'png',
         );
 
+        $pim = new shopProductImagesModel();
         $image_id = $img['id'] =  $pim->add($img);
+
         $image_path = shopImage::getPath($img);
-        if ((file_exists($image_path) && !is_writable($image_path)) || (!file_exists($image_path) && !waFiles::create($image_path))) {
-            $pim->deleteById($image_id);
-            throw new waException(
-                sprintf("The insufficient file write permissions for the %s folder.",
-                    substr($image_path, strlen($config->getRootPath()))
-                ));
-        }
 
         $image->save($image_path);
         shopImage::generateThumbs($img, $config->getImageSizes());
@@ -177,8 +181,7 @@ class shopGeneratorPluginRunController extends waLongActionController
         );
         $scp->insert($category_product);
 
-//        waLog::log(print_r($product, true), 'product.log');
-        //$this->info();
+        waFiles::delete($tmp_path);
 
         return !$this->isDone();
     }

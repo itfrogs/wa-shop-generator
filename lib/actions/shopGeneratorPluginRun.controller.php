@@ -121,6 +121,7 @@ class shopGeneratorPluginRunController extends waLongActionController
         $data['name'] = $this->data['prefix'].' (' . $product->getId() . ')';
         $data['price'] = $price;
         $data['min_price'] = $price;
+        $data['max_price'] = $price;
         $data['category_id'] = $this->data['category_id'];
         $data['type_id'] = $this->data['type_id'];
         $product->name = $data['name'];
@@ -140,8 +141,8 @@ class shopGeneratorPluginRunController extends waLongActionController
         else {
             $this->data['memory'] = memory_get_peak_usage();
             $this->data['memory_avg'] = memory_get_usage();
-            $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
             $this->data['current'] = $this->data['current'] - 1;
+            $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
         }
 
         $img = array(

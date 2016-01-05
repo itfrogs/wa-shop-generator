@@ -1,0 +1,81 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: shop/plugins/generator\n"
+"POT-Creation-Date: 2016-01-05 21:57+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: shop/plugins/generator <covoxx@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: .\n"
+"X-Generator: Poedit 1.5.4\n"
+"Language: en_US\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: .\n"
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:3
+#: /wa-apps/shop/plugins/generator/lib/config/plugin.php:3
+msgid "Products generator"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:8
+msgid "Category for generating products"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:10
+msgid "Select a category"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:15
+msgid "Prefix the name of the product"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:17
+msgid "Product"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:21
+msgid "Type of products"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:33
+msgid "Number of products generated"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:51
+msgid "Start"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/actions/shopGeneratorPluginRun.controller.php:237
+msgid "Successfully"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/actions/shopGeneratorPluginRun.controller.php:243
+msgid "%02d hr %02d min %02d sec"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/actions/shopGeneratorPluginRun.controller.php:244
+msgid "(total time: %s)"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:7
+msgid "Set the product image width."
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:13
+msgid "Set the product image height."
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:6
+msgid "Product image width"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:12
+msgid "Product image height"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/lib/config/plugin.php:4
+msgid "The plugin generates a specified number of products in category."
+msgstr ""

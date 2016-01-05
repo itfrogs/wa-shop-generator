@@ -1,6 +1,5 @@
 $.extend($.importexport.plugins, {
     generator: {
-
         $form: null,
         progress: false,
         ajax_pull: {},
@@ -165,7 +164,8 @@ $.extend($.importexport.plugins, {
                     var title = 'Memory usage: ' + self.debug.memory_avg + '/' + self.debug.memory + 'MB';
                     title += ' (' + (1 + response.stage_num) + '/' + (0 + response.stage_count) + ')';
 
-                    var message = response.progress + ' — ' + response.stage_name;
+                    //var message = response.progress + ' — ' + response.stage_name;
+                    var message = response.progress;
 
                     $bar.parents('.progressbar').attr('title', response.progress);
                     $description = self.form.find('.progressbar-description');

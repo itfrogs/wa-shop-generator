@@ -10,6 +10,9 @@ class shopGeneratorPluginBackendActions extends waViewActions
      */
     public function setupAction()
     {
+        $type_model = new shopTypeModel();
+        $product_types = $type_model->getTypes(true);
+        $this->view->assign('product_types', $product_types);
         $this->view->assign('categories', new shopCategories());
     }
 

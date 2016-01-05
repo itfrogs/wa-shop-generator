@@ -10,6 +10,10 @@ class shopGeneratorPluginRunController extends waLongActionController
      */
     private $config;
 
+    /**
+     * @var shopGeneratorPlugin $plugin
+     */
+    private $plugin;
 
     public function __construct() {
         $this->lipsum_short = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce luctus posuere augue. Maecenas mattis venenatis metus sit amet fermentum. Morbi in feugiat quam. Maecenas commodo eget elit aliquam posuere. Integer vitae eros id velit cursus euismod ac eget odio. Sed volutpat tellus id tortor molestie, a varius arcu ornare. Aliquam quis risus sit amet libero mollis efficitur. Aenean condimentum lectus vel suscipit sollicitudin. Sed venenatis quis arcu nec gravida.';
@@ -52,16 +56,19 @@ class shopGeneratorPluginRunController extends waLongActionController
             $options['processId'] = $this->processId;
 
             $this->data += array(
-                'timestamp'     => time(),
-                'count'         => $options['config']['num'],
-                'current'       => $options['config']['num'],
-                'category_id'   => $options['config']['category_id'],
-                'prefix'        => $options['config']['prefix'],
-                'processed_count'    => 0,
-                'error'         => NULL,
-                'memory'        => memory_get_peak_usage(),
-                'memory_avg'    => memory_get_usage(),
+                'timestamp'         => time(),
+                'count'             => $options['config']['num'],
+                'current'           => $options['config']['num'],
+                'category_id'       => $options['config']['category_id'],
+                'prefix'            => $options['config']['prefix'],
+                'type_id'           => $options['config']['type_id'],
+                'processed_count'   => 0,
+                'error'             => NULL,
+                'memory'            => memory_get_peak_usage(),
+                'memory_avg'        => memory_get_usage(),
             );
+
+            $this->plugin = wa()->getPlugin('generator');
 
         } catch (waException $e) {
             echo json_encode(array('error' => $e->getMessage()));
@@ -82,35 +89,28 @@ class shopGeneratorPluginRunController extends waLongActionController
      */
     protected function step()
     {
-        $this->data['memory'] = memory_get_peak_usage();
-        $this->data['memory_avg'] = memory_get_usage();
-        $this->data['current']--;
-        $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
+        $this->plugin = wa()->getPlugin('generator');
+        $settings = $this->plugin->getSettings();
 
         /**
-         * @property string $name
-         * @property string $summary
-         * @property string $description
-         * @property int $contact_id
-         * @property int $status
-         * @property int $sku_id
-         * @property int $sku_type
-         * @property string $url
-         * @property float $price
-         * @property string $currency
-         * @property int|null $count
-         * @property int $category_id
+         * @var shopConfig $config
          */
+        $config = $this->getConfig();
+
+        $this->data['memory'] = memory_get_peak_usage();
+        $this->data['memory_avg'] = memory_get_usage();
+        $this->data['current'] = $this->data['current'] - 1;
+        $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
+
         $price = rand(100, 10000);
         $data = array(
             'name' => $this->data['prefix'],
             'summary' => $this->lipsum_short,
             'description' => $this->lipsum_full,
             'contact_id' => wa()->getUser()->getId(),
-            'category_id' => $this->data['category_id'],
             'contact' => wa()->getUser(),
             'status' => 1,
-            'url' => shopHelper::genUniqueUrl($this->data['prefix'], new shopProductModel(), $this->data['processed_count']),
+            'url' => shopHelper::genUniqueUrl($this->data['prefix'], new shopProductModel()),
             'price' => $price,
             'count' => null,
             'currency' => $this->config->getCurrency(true),
@@ -121,13 +121,45 @@ class shopGeneratorPluginRunController extends waLongActionController
         $data['name'] = $this->data['prefix'].' (' . $product->getId() . ')';
         $data['price'] = $price;
         $data['min_price'] = $price;
-        $data['max_price'] = $price;
+        $data['category_id'] = $this->data['category_id'];
+        $data['type_id'] = $this->data['type_id'];
         $product->name = $data['name'];
-        $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel(), $product->getId());
+        $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel());
         $product->url = $data['url'];
 
-        //$image = new shopImage()
+        $raw_img = file_get_contents('http://robohash.itfrogs.ru/'.$data['url'].'&size='.$settings['image_width'].'x'.$settings['image_height']);
+        $tmp_path = wa()->getDataPath('data/generator/image.png', true, 'shop', true);
+        file_put_contents($tmp_path, $raw_img);
+        //$file = waFiles::
+        $image = waImage::factory($tmp_path);
+        //$image->save();
 
+        $pim = new shopProductImagesModel();
+        $img = array(
+            'product_id'        => $product->getId(),
+            'upload_datetime'   => date('Y-m-d H:i:s'),
+            'width'             => $image->width,
+            'height'            => $image->height,
+            'size'              => filesize($image->file),
+            'filename'          => basename($image->file),
+            'original_filename' => basename($image->file),
+            'ext'               => 'png',
+        );
+
+        $image_id = $img['id'] =  $pim->add($img);
+        $image_path = shopImage::getPath($img);
+        if ((file_exists($image_path) && !is_writable($image_path)) || (!file_exists($image_path) && !waFiles::create($image_path))) {
+            $pim->deleteById($image_id);
+            throw new waException(
+                sprintf("The insufficient file write permissions for the %s folder.",
+                    substr($image_path, strlen($config->getRootPath()))
+                ));
+        }
+
+        $image->save($image_path);
+        shopImage::generateThumbs($img, $config->getImageSizes());
+
+        $data['image_id'] = $image_id;
         $product->save($data);
 
         $sku_model = new shopProductSkusModel();
@@ -136,7 +168,17 @@ class shopGeneratorPluginRunController extends waLongActionController
         $sku['primary_price'] = $price;
         $sku['available'] = 1;
         $sku_model->updateById($sku['id'], $sku);
+
+        $scp = new shopCategoryProductsModel();
+        $category_product = array(
+            'product_id' => $product->getId(),
+            'category_id' => $data['category_id'],
+            'sort' => 0,
+        );
+        $scp->insert($category_product);
+
 //        waLog::log(print_r($product, true), 'product.log');
+        //$this->info();
 
         return !$this->isDone();
     }
@@ -175,7 +217,7 @@ class shopGeneratorPluginRunController extends waLongActionController
             'memory_avg' => sprintf('%0.2fMByte', $this->data['memory_avg'] / 1048576),
         );
 
-        $response['progress'] = sprintf('%0.3f%%', 100.0 * (1.0 * $this->data['processed_count'] / ($this->data['processed_count'] + 1)) / $this->data['count']);
+        $response['progress'] = sprintf('%0.3f%%', 100.0 * $this->data['processed_count'] / $this->data['count']);
 
         $response['current_count'] = $this->data['current'];
         $response['processed_count'] = $this->data['processed_count'];

@@ -18,6 +18,18 @@
                 </div>
             </div>
             <div class="field">
+                <div class="name">[`Type of products`]</div>
+                <div class="value">
+                    <select name="config[type_id]">
+                        {foreach $product_types as $id=>$type}
+                            <option value="{$id}">
+                                {$type.name|escape}
+                            </option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="field">
                 <div class="name">[`Number of products generated`]</div>
                 <div class="value">
                     <input class="long" type="text" name="config[num]" value="0">

@@ -130,9 +130,6 @@ class shopGeneratorPluginRunController extends waLongActionController
 
         $image = waImage::factory($tmp_path);
 
-        waLog::log(print_r($product->getId(), true), 'images.log');
-        waLog::log(print_r($image, true), 'images.log');
-
         if (!file_exists($tmp_path) || !$image) {
             $spm = new shopProductModel();
             $spm->deleteById($product->getId());

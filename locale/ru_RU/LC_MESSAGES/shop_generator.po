@@ -20,11 +20,11 @@ msgstr ""
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:3
 #: /wa-apps/shop/plugins/generator/lib/config/plugin.php:3
 msgid "Products generator"
-msgstr "Генератор продуктов"
+msgstr "Генератор товаров"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:8
 msgid "Category for generating products"
-msgstr "Категория для генерации продуктов"
+msgstr "Категория для генерации товаров"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:10
 msgid "Select a category"
@@ -32,19 +32,19 @@ msgstr "Выберите категорию"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:15
 msgid "Prefix the name of the product"
-msgstr "Префикс имени продукта"
+msgstr "Префикс имени товара"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:17
 msgid "Product"
-msgstr "Продукт"
+msgstr "Товар"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:21
 msgid "Type of products"
-msgstr "Тип продуктов"
+msgstr "Тип товара"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:33
 msgid "Number of products generated"
-msgstr "Количество генерируемых продуктов"
+msgstr "Количество генерируемых товаров"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:51
 msgid "Start"
@@ -64,21 +64,21 @@ msgstr "(время исполнения: %s)"
 
 #: /wa-apps/shop/plugins/generator/lib/config/settings.php:7
 msgid "Set the product image width."
-msgstr "Задайте ширину изображения продукта."
+msgstr "Задайте ширину изображения товара."
 
 #: /wa-apps/shop/plugins/generator/lib/config/settings.php:13
 msgid "Set the product image height."
-msgstr "Задайте высоту изображения продукта."
+msgstr "Задайте высоту изображения товара."
 
 #: /wa-apps/shop/plugins/generator/lib/config/settings.php:6
 msgid "Product image width"
-msgstr "Ширина изображения продукта"
+msgstr "Ширина изображения товара"
 
 #: /wa-apps/shop/plugins/generator/lib/config/settings.php:12
 msgid "Product image height"
-msgstr "Высота изображения продукта"
+msgstr "Высота изображения товара"
 
 #: /wa-apps/shop/plugins/generator/lib/config/plugin.php:4
 msgid "The plugin generates a specified number of products in category."
 msgstr ""
-"Плагин генерирует определенное количество продуктов в заданной категории."
+"Плагин генерирует определенное количество товаров в заданной категории."

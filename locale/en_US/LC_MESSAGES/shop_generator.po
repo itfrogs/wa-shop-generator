@@ -79,3 +79,9 @@ msgstr ""
 #: /wa-apps/shop/plugins/generator/lib/config/plugin.php:4
 msgid "The plugin generates a specified number of products in category."
 msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:64
+msgid ""
+"Do not close the browser window and not leave the page as long as the "
+"process is completed"
+msgstr ""

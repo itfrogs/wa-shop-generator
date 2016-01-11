@@ -57,11 +57,12 @@ class shopGeneratorPluginRunController extends waLongActionController
 
             $this->data += array(
                 'timestamp'         => time(),
-                'count'             => $options['config']['num'],
-                'current'           => $options['config']['num'],
+                'count'             => intval($options['config']['num']),
+                'current'           => intval($options['config']['num']),
                 'category_id'       => $options['config']['category_id'],
                 'prefix'            => $options['config']['prefix'],
                 'type_id'           => $options['config']['type_id'],
+                'images_num'        => intval($options['config']['images_num']),
                 'processed_count'   => 0,
                 'error'             => NULL,
                 'memory'            => memory_get_peak_usage(),
@@ -111,9 +112,15 @@ class shopGeneratorPluginRunController extends waLongActionController
             'currency' => $this->config->getCurrency(true),
         );
 
-        $raw_img = file_get_contents('http://robohash.itfrogs.ru/'.$data['url'].'&size='.$settings['image_width'].'x'.$settings['image_height']);
-        $tmp_path = wa()->getDataPath('data/generator/image.png', true, 'shop', true);
-        file_put_contents($tmp_path, $raw_img);
+        $images = array();
+        for ($i=0; $i<$this->data['images_num']; $i++) {
+            $images[$i]['name'] = 'image'.$i.'.png';
+            $images[$i]['raw_img'] = file_get_contents('http://robohash.itfrogs.ru/'.$data['url'].$images[$i]['name'].'&size='.$settings['image_width'].'x'.$settings['image_height']);
+            $images[$i]['tmp_path'] = wa()->getDataPath('data/generator/'.$images[$i]['name'], true, 'shop', true);
+            file_put_contents($images[$i]['tmp_path'], $images[$i]['raw_img']);
+        }
+
+        //TODO: переделать под цикл остальное0
 
         $product = new shopProduct();
         $product->save($data);
@@ -128,41 +135,46 @@ class shopGeneratorPluginRunController extends waLongActionController
         $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel());
         $product->url = $data['url'];
 
-        $image = waImage::factory($tmp_path);
+        foreach ($images as $i => $im) {
+            $image = waImage::factory($im['tmp_path']);
 
-        if (!file_exists($tmp_path) || !$image) {
-            $spm = new shopProductModel();
-            $spm->deleteById($product->getId());
-            return !$this->isDone();
+            if (!file_exists($im['tmp_path']) || !$image) {
+                $spm = new shopProductModel();
+                $spm->deleteById($product->getId());
+            }
+            else {
+                $img = array(
+                    'product_id'        => $product->getId(),
+                    'upload_datetime'   => date('Y-m-d H:i:s'),
+                    'width'             => $image->width,
+                    'height'            => $image->height,
+                    'size'              => filesize($image->file),
+                    'filename'          => basename($image->file),
+                    'original_filename' => basename($image->file),
+                    'ext'               => 'png',
+                );
+
+                $pim = new shopProductImagesModel();
+                $images[$i]['id'] = $img['id'] =  $pim->add($img);
+
+                $image_path = shopImage::getPath($img);
+
+                $image->save($image_path);
+                shopImage::generateThumbs($img, $config->getImageSizes());
+            }
         }
-        else {
-            $this->data['memory'] = memory_get_peak_usage();
-            $this->data['memory_avg'] = memory_get_usage();
-            $this->data['current'] = $this->data['current'] - 1;
-            $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
+
+        if (!empty($images)) {
+            $image = reset($images);
+            $data['image_id'] = $image['id'];
         }
 
-        $img = array(
-            'product_id'        => $product->getId(),
-            'upload_datetime'   => date('Y-m-d H:i:s'),
-            'width'             => $image->width,
-            'height'            => $image->height,
-            'size'              => filesize($image->file),
-            'filename'          => basename($image->file),
-            'original_filename' => basename($image->file),
-            'ext'               => 'png',
-        );
-
-        $pim = new shopProductImagesModel();
-        $image_id = $img['id'] =  $pim->add($img);
-
-        $image_path = shopImage::getPath($img);
-
-        $image->save($image_path);
-        shopImage::generateThumbs($img, $config->getImageSizes());
-
-        $data['image_id'] = $image_id;
         $product->save($data);
+
+        $this->data['memory'] = memory_get_peak_usage();
+        $this->data['memory_avg'] = memory_get_usage();
+        $this->data['current'] = $this->data['current'] - 1;
+        $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
 
         $sku_model = new shopProductSkusModel();
         $sku = $sku_model->getById($product->sku_id);
@@ -179,7 +191,9 @@ class shopGeneratorPluginRunController extends waLongActionController
         );
         $scp->insert($category_product);
 
-        waFiles::delete($tmp_path);
+        foreach ($images as $i => $im) {
+            waFiles::delete($im['tmp_path']);
+        }
 
         return !$this->isDone();
     }

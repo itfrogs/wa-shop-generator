@@ -85,3 +85,7 @@ msgid ""
 "Do not close the browser window and not leave the page as long as the "
 "process is completed"
 msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:39
+msgid "Number of images for each product"
+msgstr ""

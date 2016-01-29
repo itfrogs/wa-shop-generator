@@ -90,3 +90,7 @@ msgid ""
 msgstr ""
 "Не закрывайте окно браузера и не покидайте страницу до тех пор, пока процесс "
 "не будет завершен"
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:39
+msgid "Number of images for each product"
+msgstr "Количество изображений для каждого товара"

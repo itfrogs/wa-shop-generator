@@ -135,6 +135,8 @@ class shopGeneratorPluginRunController extends waLongActionController
         $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel());
         $product->url = $data['url'];
 
+        $category_model =  new shopCategoryModel();
+
         foreach ($images as $i => $im) {
             $image = waImage::factory($im['tmp_path']);
 
@@ -149,7 +151,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                     'width'             => $image->width,
                     'height'            => $image->height,
                     'size'              => filesize($image->file),
-                    'filename'          => basename($image->file),
+                    //'filename'          => basename($image->file),
                     'original_filename' => basename($image->file),
                     'ext'               => 'png',
                 );
@@ -190,6 +192,7 @@ class shopGeneratorPluginRunController extends waLongActionController
             'sort' => 0,
         );
         $scp->insert($category_product);
+        $category_model->query('UPDATE shop_category SET count = count + 1 WHERE id = i:category_id', array('category_id' => $data['category_id']));
 
         foreach ($images as $i => $im) {
             waFiles::delete($im['tmp_path']);

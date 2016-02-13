@@ -64,6 +64,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                 'type_id'           => $options['config']['type_id'],
                 'images_num'        => intval($options['config']['images_num']),
                 'images_count'      => intval($options['config']['images_num']),
+                'images'            => array(),
                 'processed_count'   => 0,
                 'error'             => NULL,
                 'memory'            => memory_get_peak_usage(),
@@ -119,15 +120,14 @@ class shopGeneratorPluginRunController extends waLongActionController
             'height'    => $settings['image_height'],
         );
 
-        $images = array();
         $temp_image_path = wa()->getDataPath('plugins/generator/', true, 'shop', true) . 'robohash.png';
 
         $i = $this->data['images_num'] - $this->data['images_count'];
-        $images[$i]['name'] = 'image'.$i.'.png';
-        $images[$i]['tmp_path'] = wa()->getDataPath('plugins/generator/'.$images[$i]['name'], true, 'shop', true);
-        $im = $robohash->generate($data['url'].$images[$i]['name'], $options);
+        $this->data['images'][$i]['name'] = 'image'.$i.'.png';
+        $this->data['images'][$i]['tmp_path'] = wa()->getDataPath('plugins/generator/'.$this->data['images'][$i]['name'], true, 'shop', true);
+        $im = $robohash->generate($data['url'].$this->data['images'][$i]['name'], $options);
         if (!empty($im)) {
-            waFiles::move($temp_image_path, $images[$i]['tmp_path']);
+            waFiles::move($temp_image_path, $this->data['images'][$i]['tmp_path']);
         }
         $this->data['images_count']--;
 
@@ -151,7 +151,7 @@ class shopGeneratorPluginRunController extends waLongActionController
 
             $category_model =  new shopCategoryModel();
 
-            foreach ($images as $i => $im) {
+            foreach ($this->data['images'] as $j => $im) {
                 $image = waImage::factory($im['tmp_path']);
 
                 if (!file_exists($im['tmp_path']) || !$image) {
@@ -171,7 +171,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                     );
 
                     $pim = new shopProductImagesModel();
-                    $images[$i]['id'] = $img['id'] =  $pim->add($img);
+                    $this->data['images'][$j]['id'] = $img['id'] =  $pim->add($img);
 
                     $image_path = shopImage::getPath($img);
 
@@ -180,8 +180,8 @@ class shopGeneratorPluginRunController extends waLongActionController
                 }
             }
 
-            if (!empty($images)) {
-                $image = reset($images);
+            if (!empty($this->data['images'])) {
+                $image = reset($this->data['images']);
                 $data['image_id'] = $image['id'];
             }
 
@@ -208,11 +208,12 @@ class shopGeneratorPluginRunController extends waLongActionController
             $scp->insert($category_product);
             $category_model->query('UPDATE shop_category SET count = count + 1 WHERE id = i:category_id', array('category_id' => $data['category_id']));
 
-            foreach ($images as $i => $im) {
+            foreach ($this->data['images'] as $i => $im) {
                 waFiles::delete($im['tmp_path']);
             }
 
             $this->data['images_count'] = intval($this->data['images_num']);
+            $this->data['images'] = array();
         }
 
         return !$this->isDone();

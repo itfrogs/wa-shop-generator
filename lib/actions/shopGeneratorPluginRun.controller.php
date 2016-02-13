@@ -91,6 +91,7 @@ class shopGeneratorPluginRunController extends waLongActionController
     protected function step()
     {
         $this->plugin = wa()->getPlugin('generator');
+        $robohash = new shopGeneratorPluginRobohash();
         $settings = $this->plugin->getSettings();
 
         /**
@@ -112,15 +113,21 @@ class shopGeneratorPluginRunController extends waLongActionController
             'currency' => $this->config->getCurrency(true),
         );
 
+        $options = array(
+            'width'     => $settings['image_width'],
+            'height'    => $settings['image_height'],
+        );
+
         $images = array();
+        $temp_image_path = wa()->getDataPath('plugins/generator/', true, 'shop', true) . 'robohash.png';
         for ($i=0; $i<$this->data['images_num']; $i++) {
             $images[$i]['name'] = 'image'.$i.'.png';
-            $images[$i]['raw_img'] = file_get_contents('http://robohash.itfrogs.ru/'.$data['url'].$images[$i]['name'].'&size='.$settings['image_width'].'x'.$settings['image_height']);
-            $images[$i]['tmp_path'] = wa()->getDataPath('data/generator/'.$images[$i]['name'], true, 'shop', true);
-            file_put_contents($images[$i]['tmp_path'], $images[$i]['raw_img']);
+            $images[$i]['tmp_path'] = wa()->getDataPath('plugins/generator/'.$images[$i]['name'], true, 'shop', true);
+            $im = $robohash->generate($data['url'].$images[$i]['name'], $options);
+            if (!empty($im)) {
+                waFiles::move($temp_image_path, $images[$i]['tmp_path']);
+            }
         }
-
-        //TODO: переделать под цикл остальное0
 
         $product = new shopProduct();
         $product->save($data);
@@ -280,5 +287,4 @@ class shopGeneratorPluginRunController extends waLongActionController
         }
         return $result;
     }
-
 }

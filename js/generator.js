@@ -195,7 +195,7 @@ $.extend($.importexport.plugins, {
                             self.progressHandler(url, id, null);
                         }
                     });
-                }, 500));
+                }, 1000));
             }
         }
     }

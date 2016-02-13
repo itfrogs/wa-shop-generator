@@ -63,6 +63,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                 'prefix'            => $options['config']['prefix'],
                 'type_id'           => $options['config']['type_id'],
                 'images_num'        => intval($options['config']['images_num']),
+                'images_count'      => intval($options['config']['images_num']),
                 'processed_count'   => 0,
                 'error'             => NULL,
                 'memory'            => memory_get_peak_usage(),
@@ -120,89 +121,98 @@ class shopGeneratorPluginRunController extends waLongActionController
 
         $images = array();
         $temp_image_path = wa()->getDataPath('plugins/generator/', true, 'shop', true) . 'robohash.png';
-        for ($i=0; $i<$this->data['images_num']; $i++) {
-            $images[$i]['name'] = 'image'.$i.'.png';
-            $images[$i]['tmp_path'] = wa()->getDataPath('plugins/generator/'.$images[$i]['name'], true, 'shop', true);
-            $im = $robohash->generate($data['url'].$images[$i]['name'], $options);
-            if (!empty($im)) {
-                waFiles::move($temp_image_path, $images[$i]['tmp_path']);
-            }
+
+        $i = $this->data['images_num'] - $this->data['images_count'];
+        $images[$i]['name'] = 'image'.$i.'.png';
+        $images[$i]['tmp_path'] = wa()->getDataPath('plugins/generator/'.$images[$i]['name'], true, 'shop', true);
+        $im = $robohash->generate($data['url'].$images[$i]['name'], $options);
+        if (!empty($im)) {
+            waFiles::move($temp_image_path, $images[$i]['tmp_path']);
         }
+        $this->data['images_count']--;
 
-        $product = new shopProduct();
-        $product->save($data);
+        //for ($i=0; $i<$this->data['images_num']; $i++) {
 
-        $data['name'] = $this->data['prefix'].' (' . $product->getId() . ')';
-        $data['price'] = $price;
-        $data['min_price'] = $price;
-        $data['max_price'] = $price;
-        $data['category_id'] = $this->data['category_id'];
-        $data['type_id'] = $this->data['type_id'];
-        $product->name = $data['name'];
-        $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel());
-        $product->url = $data['url'];
+        //}
 
-        $category_model =  new shopCategoryModel();
+        if ($this->data['images_count'] < 1) {
+            $product = new shopProduct();
+            $product->save($data);
 
-        foreach ($images as $i => $im) {
-            $image = waImage::factory($im['tmp_path']);
+            $data['name'] = $this->data['prefix'].' (' . $product->getId() . ')';
+            $data['price'] = $price;
+            $data['min_price'] = $price;
+            $data['max_price'] = $price;
+            $data['category_id'] = $this->data['category_id'];
+            $data['type_id'] = $this->data['type_id'];
+            $product->name = $data['name'];
+            $data['url'] = shopHelper::genUniqueUrl($this->data['prefix'].'-'.$product->getId(), new shopProductModel());
+            $product->url = $data['url'];
 
-            if (!file_exists($im['tmp_path']) || !$image) {
-                $spm = new shopProductModel();
-                $spm->deleteById($product->getId());
+            $category_model =  new shopCategoryModel();
+
+            foreach ($images as $i => $im) {
+                $image = waImage::factory($im['tmp_path']);
+
+                if (!file_exists($im['tmp_path']) || !$image) {
+                    $spm = new shopProductModel();
+                    $spm->deleteById($product->getId());
+                }
+                else {
+                    $img = array(
+                        'product_id'        => $product->getId(),
+                        'upload_datetime'   => date('Y-m-d H:i:s'),
+                        'width'             => $image->width,
+                        'height'            => $image->height,
+                        'size'              => filesize($image->file),
+                        //'filename'          => basename($image->file),
+                        'original_filename' => basename($image->file),
+                        'ext'               => 'png',
+                    );
+
+                    $pim = new shopProductImagesModel();
+                    $images[$i]['id'] = $img['id'] =  $pim->add($img);
+
+                    $image_path = shopImage::getPath($img);
+
+                    $image->save($image_path);
+                    shopImage::generateThumbs($img, $config->getImageSizes());
+                }
             }
-            else {
-                $img = array(
-                    'product_id'        => $product->getId(),
-                    'upload_datetime'   => date('Y-m-d H:i:s'),
-                    'width'             => $image->width,
-                    'height'            => $image->height,
-                    'size'              => filesize($image->file),
-                    //'filename'          => basename($image->file),
-                    'original_filename' => basename($image->file),
-                    'ext'               => 'png',
-                );
 
-                $pim = new shopProductImagesModel();
-                $images[$i]['id'] = $img['id'] =  $pim->add($img);
-
-                $image_path = shopImage::getPath($img);
-
-                $image->save($image_path);
-                shopImage::generateThumbs($img, $config->getImageSizes());
+            if (!empty($images)) {
+                $image = reset($images);
+                $data['image_id'] = $image['id'];
             }
-        }
 
-        if (!empty($images)) {
-            $image = reset($images);
-            $data['image_id'] = $image['id'];
-        }
+            $product->save($data);
 
-        $product->save($data);
+            $this->data['memory'] = memory_get_peak_usage();
+            $this->data['memory_avg'] = memory_get_usage();
+            $this->data['current'] = $this->data['current'] - 1;
+            $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
 
-        $this->data['memory'] = memory_get_peak_usage();
-        $this->data['memory_avg'] = memory_get_usage();
-        $this->data['current'] = $this->data['current'] - 1;
-        $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
+            $sku_model = new shopProductSkusModel();
+            $sku = $sku_model->getById($product->sku_id);
+            $sku['price'] = $price;
+            $sku['primary_price'] = $price;
+            $sku['available'] = 1;
+            $sku_model->updateById($sku['id'], $sku);
 
-        $sku_model = new shopProductSkusModel();
-        $sku = $sku_model->getById($product->sku_id);
-        $sku['price'] = $price;
-        $sku['primary_price'] = $price;
-        $sku['available'] = 1;
-        $sku_model->updateById($sku['id'], $sku);
+            $scp = new shopCategoryProductsModel();
+            $category_product = array(
+                'product_id' => $product->getId(),
+                'category_id' => $data['category_id'],
+                'sort' => 0,
+            );
+            $scp->insert($category_product);
+            $category_model->query('UPDATE shop_category SET count = count + 1 WHERE id = i:category_id', array('category_id' => $data['category_id']));
 
-        $scp = new shopCategoryProductsModel();
-        $category_product = array(
-            'product_id' => $product->getId(),
-            'category_id' => $data['category_id'],
-            'sort' => 0,
-        );
-        $scp->insert($category_product);
-        $category_model->query('UPDATE shop_category SET count = count + 1 WHERE id = i:category_id', array('category_id' => $data['category_id']));
+            foreach ($images as $i => $im) {
+                waFiles::delete($im['tmp_path']);
+            }
 
-        foreach ($images as $i => $im) {
-            waFiles::delete($im['tmp_path']);
+            $this->data['images_count'] = intval($this->data['images_num']);
         }
 
         return !$this->isDone();

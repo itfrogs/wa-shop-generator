@@ -94,3 +94,47 @@ msgstr ""
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:39
 msgid "Number of images for each product"
 msgstr "Количество изображений для каждого товара"
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:6
+msgid "Basic settings can be found in the "
+msgstr "Основные настройки можно найти в "
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:6
+msgid "generator plugin settings"
+msgstr "настройках плагина"
+
+#: /wa-apps/shop/plugins/generator/templates/feedbackControl.html:5
+msgid "QR code"
+msgstr "QR код"
+
+#: /wa-apps/shop/plugins/generator/templates/feedbackControl.html:9
+msgid "Technical support"
+msgstr "Техническая поддержка"
+
+#: /wa-apps/shop/plugins/generator/templates/hint.html:2
+msgid "Products generation is in the "
+msgstr "Товары генерируются в "
+
+#: /wa-apps/shop/plugins/generator/templates/hint.html:2
+msgid "export section"
+msgstr "разделе импорта/экспорта"
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:19
+msgid "Check, if you want render image background."
+msgstr "Отметьте"
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:18
+msgid "Render background"
+msgstr "Сгенерировать задний план"
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:22
+msgid "Ask for technical support"
+msgstr "Запросить техническую поддержку"
+
+#: /wa-apps/shop/plugins/generator/lib/config/settings.php:23
+msgid "Click on the link to contact the developer."
+msgstr "Перейдите по ссылке, чтобы связаться с разработчиком."
+
+#: /wa-apps/shop/plugins/generator/lib/config/requirements.php:9
+msgid "This extension is used for computing"
+msgstr "Расшрение, которое используется для вычислений"

@@ -18,4 +18,12 @@ return array (
         'title' => _wp('Render background'),
         'description' => _wp("Check, if you want render image background."),
     ),
+    'feedback' => array(
+        'title' => _wp('Ask for technical support'),
+        'description'   => _wp('Click on the link to contact the developer.'),
+        'control_type' => waHtmlControl::CUSTOM.' '.'shopGeneratorPlugin::getFeedbackControl'
+    ),
+    'hint' => array(
+        'control_type' => waHtmlControl::CUSTOM . ' ' . 'shopGeneratorPlugin::settingCustomControlHint',
+    ),
 );

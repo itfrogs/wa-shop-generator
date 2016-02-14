@@ -82,7 +82,11 @@ class shopGeneratorPluginRobohash
 
     function set_color($color)
     {
-        $this->set = 'set1/';
+        if (empty($this->set)) {
+            $this->set = 'set1/';
+        }
+        $set = explode('/', $this->set);
+        $this->set = $set[0] . '/';
 
         if ($color && in_array($color, self::$colors))
         {
@@ -142,9 +146,14 @@ class shopGeneratorPluginRobohash
         $dirs = array();
         foreach (self::$sets as $set) {
             foreach (self::$colors as $color) {
-                $dirs[$set][$color] = glob($this->image_dir . "{$set}/{$color}/*");
+                $color_dirs = glob($this->image_dir . "{$set}/{$color}/*");
+                foreach ($color_dirs as $key => $color_dir) {
+                    $files = glob($color_dir . "/*");
+                    foreach ($files as $file) {
+                        $dirs[$set][$color][$key][] = $file;
+                    }
+                }
             }
-
         }
         return $dirs;
     }
@@ -163,7 +172,8 @@ class shopGeneratorPluginRobohash
 
         foreach ($dirs as $dir)
         {
-            $files = glob("$dir/*");
+            //$files = glob("$dir/*");
+            $files = $dir;
             $img_index = bcmod($this->hash_list[$this->hash_index], count($files));
             $this->hash_index++;
             $s = explode('#', $files[$img_index], 2);

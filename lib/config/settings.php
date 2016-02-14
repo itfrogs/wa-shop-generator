@@ -12,4 +12,10 @@ return array (
         'title' => _wp('Product image height'),
         'description' => _wp("Set the product image height."),
     ),
+    'background' => array(
+        'value' => "0",
+        'control_type' => waHtmlControl::CHECKBOX,
+        'title' => _wp('Render background'),
+        'description' => _wp("Check, if you want render image background."),
+    ),
 );

@@ -32,26 +32,36 @@ class shopGeneratorPluginRobohash
     function  __construct($options=array()) {
         $this->temp_image = wa()->getDataPath('plugins/generator/', true, 'shop', true) . 'robohash.png';
         self::$plugin = wa()->getPlugin('generator');
+        $settings = self::$plugin->getSettings();
         $this->image_dir = self::$plugin->getPluginPath() . '/img/robohash/';
 
         $color = isset($options['color']) ? $options['color'] : false;
-        $set   = isset($options['set'])   ? $options['set']   : 'set1';
+        $set   = isset($options['set'])   ? $options['set']   : 'any';
         $bgset = isset($options['bgset']) ? $options['bgset'] : false;
         $size  = isset($options['size'])  ? $options['size']  : false;
         $width = isset($options['width'])  ? $options['width']  : 400;
         $height = isset($options['height'])  ? $options['height']  : 400;
+
+        if ($set != 'set1') {
+            $color = 'white';
+        }
 
         $ext = 'png';
 
         $filename = md5("{$options['text']}_{$set}_{$bgset}_{$color}_{$size}") . ".$ext";
 
         $this->create_hashes($options['text']);
-        $this->set_color($color) ;
         $this->set_set($set);
+        $this->set_color($color) ;
 
         if ($bgset)
         {
-            $this->set_bgset($bgset) ;
+            $this->set_bgset($bgset);
+        }
+        else {
+            if ($settings['background']) {
+                $this->set_bgset(self::$bgsets[bcmod($this->hash_list[2], count(self::$bgsets))]);
+            }
         }
 
         $this->set_size($size) ;
@@ -145,7 +155,14 @@ class shopGeneratorPluginRobohash
     {
         $dirs = array();
         foreach (self::$sets as $set) {
-            foreach (self::$colors as $color) {
+            if ($set == 'set1') {
+                $colors = self::$colors;
+            }
+            else {
+                $colors  = array('white');
+            }
+
+            foreach ($colors as $color) {
                 $color_dirs = glob($this->image_dir . "{$set}/{$color}/*");
                 foreach ($color_dirs as $key => $color_dir) {
                     $files = glob($color_dir . "/*");
@@ -170,6 +187,9 @@ class shopGeneratorPluginRobohash
 
         $image_list = array();
 
+        waLog::dump($this->set, 'set3.log');
+        waLog::dump($dirs, 'ddirs.log');
+
         foreach ($dirs as $dir)
         {
             //$files = glob("$dir/*");
@@ -192,6 +212,7 @@ class shopGeneratorPluginRobohash
         {
             array_unshift($image_list, $this->bgset);
         }
+        waLog::dump($image_list, 'llist.log');
         return $image_list;
     }
 

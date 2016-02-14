@@ -187,9 +187,6 @@ class shopGeneratorPluginRobohash
 
         $image_list = array();
 
-        waLog::dump($this->set, 'set3.log');
-        waLog::dump($dirs, 'ddirs.log');
-
         foreach ($dirs as $dir)
         {
             //$files = glob("$dir/*");
@@ -212,7 +209,6 @@ class shopGeneratorPluginRobohash
         {
             array_unshift($image_list, $this->bgset);
         }
-        waLog::dump($image_list, 'llist.log');
         return $image_list;
     }
 

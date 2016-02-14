@@ -21,16 +21,54 @@ class shopGeneratorPluginRobohash
             $bgset          = '',
             $hash_index     = 4,
             $hash_list      = array(),
+            $set_dirs       = array(),
+            $bg_dirs        = array(),
             $ext,
             $size,
             $temp_image,
             $image_width,
             $image_height;
 
-    function  __construct() {
+    function  __construct($options=array()) {
         $this->temp_image = wa()->getDataPath('plugins/generator/', true, 'shop', true) . 'robohash.png';
         self::$plugin = wa()->getPlugin('generator');
         $this->image_dir = self::$plugin->getPluginPath() . '/img/robohash/';
+
+        $color = isset($options['color']) ? $options['color'] : false;
+        $set   = isset($options['set'])   ? $options['set']   : 'set1';
+        $bgset = isset($options['bgset']) ? $options['bgset'] : false;
+        $size  = isset($options['size'])  ? $options['size']  : false;
+        $width = isset($options['width'])  ? $options['width']  : 400;
+        $height = isset($options['height'])  ? $options['height']  : 400;
+
+        $ext = 'png';
+
+        $filename = md5("{$options['text']}_{$set}_{$bgset}_{$color}_{$size}") . ".$ext";
+
+        $this->create_hashes($options['text']);
+        $this->set_color($color) ;
+        $this->set_set($set);
+
+        if ($bgset)
+        {
+            $this->set_bgset($bgset) ;
+        }
+
+        $this->set_size($size) ;
+
+        $this->filename     = $filename;
+        $this->ext          = $ext;
+        $this->image_width  = $width;
+        $this->image_height = $height;
+
+
+        if (!empty($options) && isset($options['set_dirs'])) {
+            $this->set_dirs = $options['set_dirs'];
+        }
+        if (!empty($options) && isset($options['bg_dirs'])) {
+            $this->bg_dirs = $options['bg_dirs'];
+        }
+
     }
 
     private function create_hashes($text, $length=11)
@@ -74,14 +112,54 @@ class shopGeneratorPluginRobohash
         {
             $bgset = self::$bgsets[bcmod($this->hash_list[2], count(self::$bgsets))];
         }
-        $bgfiles = glob($this->image_dir . "$bgset/*");
+
+        if (!empty($this->bgsets_array)) {
+            $this->bgset = $this->bgsets_array[$bgset];
+            return $this->bgset;
+        }
+
+        if (!empty($this->bg_dirs)) {
+            $bgfiles =  $this->bg_dirs[$this->bgset];
+        }
+        else {
+            $bgfiles = glob($this->image_dir . "$bgset/*");
+        }
+
         $this->bgset = $bgfiles[bcmod($this->hash_list[3], count($bgfiles))];
+        return $this->bgset;
+    }
+
+    public function get_bg_dirs() {
+        $dirs = array();
+        foreach (self::$bgsets as $bgset) {
+            $dirs[$bgset] = glob($this->image_dir . "$bgset/*");
+        }
+        return $dirs;
+    }
+
+    public function get_set_dirs()
+    {
+        $dirs = array();
+        foreach (self::$sets as $set) {
+            foreach (self::$colors as $color) {
+                $dirs[$set][$color] = glob($this->image_dir . "{$set}/{$color}/*");
+            }
+
+        }
+        return $dirs;
     }
 
     function get_image_list()
     {
+        if (!empty($this->set_dirs)) {
+            $params = explode('/', $this->set);
+            $dirs =  $this->set_dirs[$params[0]][$params[1]];
+        }
+        else {
+            $dirs = glob($this->image_dir . "{$this->set}/*");
+        }
+
         $image_list = array();
-        $dirs = glob($this->image_dir . "{$this->set}/*");
 
         foreach ($dirs as $dir)
         {
@@ -310,34 +388,7 @@ class shopGeneratorPluginRobohash
         imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
     }
 
-    public function generate($text, $options = array()) {
-        $color = isset($options['color']) ? $options['color'] : false;
-        $set   = isset($options['set'])   ? $options['set']   : false;
-        $bgset = isset($options['bgset']) ? $options['bgset'] : false;
-        $size  = isset($options['size'])  ? $options['size']  : false;
-        $width = isset($options['width'])  ? $options['width']  : 400;
-        $height = isset($options['height'])  ? $options['height']  : 400;
-
-        $ext = 'png';
-
-        $filename = md5("{$text}_{$set}_{$bgset}_{$color}_{$size}") . ".$ext";
-
-        $this->create_hashes($text);
-        $this->set_color($color) ;
-        $this->set_set($set);
-
-        if ($bgset)
-        {
-            $this->set_bgset($bgset) ;
-        }
-
-        $this->set_size($size) ;
-
-        $this->filename     = $filename;
-        $this->ext          = $ext;
-        $this->image_width  = $width;
-        $this->image_height = $height;
-
+    public function generate() {
         $im = $this->generate_image();
         return $im;
     }

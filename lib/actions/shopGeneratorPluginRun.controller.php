@@ -54,6 +54,10 @@ class shopGeneratorPluginRunController extends waLongActionController
 
             $options = waRequest::post();
             $options['processId'] = $this->processId;
+            $robohash_options = array(
+                'text' => md5(microtime()),
+            );
+            $robohash = new shopGeneratorPluginRobohash($robohash_options);
 
             $this->data += array(
                 'timestamp'         => time(),
@@ -65,6 +69,8 @@ class shopGeneratorPluginRunController extends waLongActionController
                 'images_num'        => intval($options['config']['images_num']),
                 'images_count'      => intval($options['config']['images_num']),
                 'images'            => array(),
+                'set_dirs'          => $robohash->get_set_dirs(),
+                'bg_dirs'           => $robohash->get_bg_dirs(),
                 'processed_count'   => 0,
                 'error'             => NULL,
                 'memory'            => memory_get_peak_usage(),
@@ -93,9 +99,8 @@ class shopGeneratorPluginRunController extends waLongActionController
     protected function step()
     {
         $this->plugin = wa()->getPlugin('generator');
-        $robohash = new shopGeneratorPluginRobohash();
         $settings = $this->plugin->getSettings();
-
+        $temp_image_path = wa()->getDataPath('plugins/generator/', true, 'shop', true) . 'robohash.png';
         /**
          * @var shopConfig $config
          */
@@ -115,25 +120,24 @@ class shopGeneratorPluginRunController extends waLongActionController
             'currency' => $this->config->getCurrency(true),
         );
 
-        $options = array(
-            'width'     => $settings['image_width'],
-            'height'    => $settings['image_height'],
-        );
-
-        $temp_image_path = wa()->getDataPath('plugins/generator/', true, 'shop', true) . 'robohash.png';
-
         $i = $this->data['images_num'] - $this->data['images_count'];
+
         $this->data['images'][$i]['name'] = 'image'.$i.'.png';
         $this->data['images'][$i]['tmp_path'] = wa()->getDataPath('plugins/generator/'.$this->data['images'][$i]['name'], true, 'shop', true);
-        $im = $robohash->generate($data['url'].$this->data['images'][$i]['name'], $options);
+        $options = array(
+            'text'          => $data['url'].$this->data['images'][$i]['name'],
+            'set_dirs'      => $this->data['set_dirs'],
+            'bg_dirs'       => $this->data['bg_dirs'],
+            'width'         => $settings['image_width'],
+            'height'        => $settings['image_height'],
+        );
+        $robohash = new shopGeneratorPluginRobohash($options);
+
+        $im = $robohash->generate();
         if (!empty($im)) {
             waFiles::move($temp_image_path, $this->data['images'][$i]['tmp_path']);
         }
         $this->data['images_count']--;
-
-        //for ($i=0; $i<$this->data['images_num']; $i++) {
-
-        //}
 
         if ($this->data['images_count'] < 1) {
             $product = new shopProduct();

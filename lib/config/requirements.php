@@ -6,6 +6,6 @@ return array(
         'version' => '5.2.0'
     ),
     'php.bcmath' => array(
-        'description' => 'This extension is used for computing', 'strict' => true,
+        'description' => _wp('This extension is used for computing'), 'strict' => true,
     ),
 );

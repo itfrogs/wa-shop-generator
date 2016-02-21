@@ -15,7 +15,7 @@ class shopGeneratorPlugin extends shopPlugin
     }
 
     /**
-     * @var shopVkshopPlugin $plugin
+     * @var shopGeneratorPlugin $plugin
      */
     private static $plugin;
     private static function getPlugin()

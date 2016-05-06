@@ -169,7 +169,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                         'width'             => $image->width,
                         'height'            => $image->height,
                         'size'              => filesize($image->file),
-                        //'filename'          => basename($image->file),
+                        'filename'          => basename($image->file),
                         'original_filename' => basename($image->file),
                         'ext'               => 'png',
                     );
@@ -178,7 +178,6 @@ class shopGeneratorPluginRunController extends waLongActionController
                     $this->data['images'][$j]['id'] = $img['id'] =  $pim->add($img);
 
                     $image_path = shopImage::getPath($img);
-
                     $image->save($image_path);
                     shopImage::generateThumbs($img, $config->getImageSizes());
                 }
@@ -194,7 +193,13 @@ class shopGeneratorPluginRunController extends waLongActionController
             $this->data['memory'] = memory_get_peak_usage();
             $this->data['memory_avg'] = memory_get_usage();
             $this->data['current'] = $this->data['current'] - 1;
-            $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
+            if ($this->data['count'] > 0) {
+                $this->data['processed_count'] = $this->data['count'] - $this->data['current'];
+            }
+            else {
+                $this->data['processed_count'] = 0;
+            }
+
 
             $sku_model = new shopProductSkusModel();
             $sku = $sku_model->getById($product->sku_id);
@@ -257,7 +262,12 @@ class shopGeneratorPluginRunController extends waLongActionController
             'memory_avg' => sprintf('%0.2fMByte', $this->data['memory_avg'] / 1048576),
         );
 
-        $response['progress'] = sprintf('%0.3f%%', 100.0 * $this->data['processed_count'] / $this->data['count']);
+        if ($this->data['count'] > 0) {
+            $response['progress'] = sprintf('%0.3f%%', 100.0 * $this->data['processed_count'] / $this->data['count']);
+        }
+        else {
+            $response['progress'] = '100%';
+        }
 
         $response['current_count'] = $this->data['current'];
         $response['processed_count'] = $this->data['processed_count'];

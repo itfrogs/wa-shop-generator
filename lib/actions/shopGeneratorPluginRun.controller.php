@@ -203,8 +203,6 @@ class shopGeneratorPluginRunController extends waLongActionController
 
             $sku_model = new shopProductSkusModel();
 
-            waLog::log($product->sku_id, 'sku-id.log');
-
             if (isset($product->sku_id) && $product->sku_id) {
                 $sku = $sku_model->getById($product->sku_id);
                 $sku['price'] = $price;

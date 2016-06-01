@@ -202,11 +202,41 @@ class shopGeneratorPluginRunController extends waLongActionController
 
 
             $sku_model = new shopProductSkusModel();
-            $sku = $sku_model->getById($product->sku_id);
-            $sku['price'] = $price;
-            $sku['primary_price'] = $price;
-            $sku['available'] = 1;
-            $sku_model->updateById($sku['id'], $sku);
+
+            waLog::log($product->sku_id, 'sku-id.log');
+
+            if (isset($product->sku_id) && $product->sku_id) {
+                $sku = $sku_model->getById($product->sku_id);
+                $sku['price'] = $price;
+                $sku['primary_price'] = $price;
+                $sku['available'] = 1;
+                $sku_model->updateById($sku['id'], $sku);
+            }
+            else {
+                $sku = array(
+                    'product_id'    => $product->getId(),
+                    'sku'           => uniqid(),
+                    'sort'          => 0,
+                    'name'          => '',
+                    'price'         => $price,
+                    'primary_price' => $price,
+                    'purchase_price' => 0,
+                    'compare_price' => 0,
+                    'available'     => 1,
+                    'virtual'       => 0,
+                );
+                if (!empty($p['stocks_expected'])) {
+                    $sku['count'] = null;
+                }
+                else {
+                    $sku['count'] = 0;
+                }
+                $sku['id'] = $sku_model->insert($sku);
+                $data['sku_id'] = $sku['id'];
+            }
+
+
+
 
             $scp = new shopCategoryProductsModel();
             $category_product = array(

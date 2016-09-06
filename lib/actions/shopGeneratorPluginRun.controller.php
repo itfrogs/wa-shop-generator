@@ -169,7 +169,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                         'width'             => $image->width,
                         'height'            => $image->height,
                         'size'              => filesize($image->file),
-                        'filename'          => basename($image->file),
+                        'filename'          => rtrim(basename($image->file), '.png'),
                         'original_filename' => basename($image->file),
                         'ext'               => 'png',
                     );
@@ -178,6 +178,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                     $this->data['images'][$j]['id'] = $img['id'] =  $pim->add($img);
 
                     $image_path = shopImage::getPath($img);
+                    waFiles::copy($image->file, $image_path);
                     $image->save($image_path);
                     shopImage::generateThumbs($img, $config->getImageSizes());
                 }
@@ -201,10 +202,11 @@ class shopGeneratorPluginRunController extends waLongActionController
             }
 
 
+
             $sku_model = new shopProductSkusModel();
 
-            if (isset($product->sku_id) && $product->sku_id) {
-                $sku = $sku_model->getById($product->sku_id);
+            if (isset($product['sku_id']) && $product['sku_id']) {
+                $sku = $sku_model->getById($product['sku_id']);
                 $sku['price'] = $price;
                 $sku['primary_price'] = $price;
                 $sku['available'] = 1;

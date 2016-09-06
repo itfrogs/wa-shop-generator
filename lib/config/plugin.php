@@ -5,8 +5,8 @@ return array(
     'icon'              => 'img/generator16.png',
     'img'               => 'img/generator16.png',
     'vendor'            => 964801,
-    'version'           => '1.0.3',
-    'importexport'      => 1,//'profiles',
+    'version'           => '1.0.4',
+    'importexport'      => 1,
     'import_profile'    => false,
     'handlers'          =>
         array(),

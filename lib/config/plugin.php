@@ -5,7 +5,7 @@ return array(
     'icon'              => 'img/generator16.png',
     'img'               => 'img/generator16.png',
     'vendor'            => 964801,
-    'version'           => '1.0.4',
+    'version'           => '1.1.0',
     'importexport'      => 1,
     'import_profile'    => false,
     'handlers'          =>

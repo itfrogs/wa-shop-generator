@@ -58,7 +58,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                 'text' => md5(microtime()),
             );
             $robohash = new shopGeneratorPluginRobohash($robohash_options);
-
+            
             $this->data += array(
                 'timestamp'         => time(),
                 'count'             => intval($options['config']['num']),
@@ -76,6 +76,10 @@ class shopGeneratorPluginRunController extends waLongActionController
                 'memory'            => memory_get_peak_usage(),
                 'memory_avg'        => memory_get_usage(),
             );
+            
+            if(isset($options['config']['features'])){
+                $this->data['features'] = $options['config']['features'];
+            }
 
             $this->plugin = wa()->getPlugin('generator');
 
@@ -119,7 +123,7 @@ class shopGeneratorPluginRunController extends waLongActionController
             'count' => null,
             'currency' => $this->config->getCurrency(true),
         );
-
+        
         $i = $this->data['images_num'] - $this->data['images_count'];
 
         $this->data['images'][$i]['name'] = 'image'.$i.'.png';
@@ -253,6 +257,49 @@ class shopGeneratorPluginRunController extends waLongActionController
 
             $this->data['images_count'] = intval($this->data['images_num']);
             $this->data['images'] = array();
+            
+            if(isset($this->data['features'])){
+                $mf = new shopFeatureModel();
+                foreach($this->data['features'] as $fid => $feature){
+                    if($feature['type']){
+                        $fvkeys = $mf->getFeatureValues($mf->getByCode($feature['code']));
+                        for($cv = 0; $cv < $feature['count']; $cv++){
+                            $val = array_rand($fvkeys);
+                            $values[] = array('id' => $val);
+                        }
+                        $fselectable[$feature['code']] = array(
+                            'values' => $values,
+                        );
+                        unset($values);
+                    }else{
+                        $fvalues = $mf->getFeatureValues($mf->getByCode($feature['code']));
+                        $key = array_rand($fvalues);
+                        $fsimple[$feature['code']] = $fvalues[$key];
+                    }
+                }
+            }
+            
+            if(isset($fselectable)){
+                $ms = new shopProductSkusModel();
+                $sku_id =  $product->sku_id;
+                $product->sku_type = 1;
+                $product->min_price = $product->max_price = 0;
+                $product->base_price_selectable = $product->price;
+                $product->features_selectable = $fselectable;
+                $product->sku_id = null;
+            }
+            if(isset($fsimple)){
+                $product->features = $fsimple;
+            }
+            $product->save();
+            if(isset($fselectable)){
+                $ms->updateByField('product_id', $product->getId(), array('price' => $product->base_price_selectable));
+                $ms->deleteById($sku_id);
+                $product->sku_count -= 1; 
+                $product->save();
+            }
+            unset($fselectable);
+            unset($fsimple);
         }
 
         return !$this->isDone();

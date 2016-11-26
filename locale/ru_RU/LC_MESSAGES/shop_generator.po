@@ -145,3 +145,7 @@ msgstr ""
 #: /wa-apps/shop/plugins/generator/templates/feedbackControl.html:9
 msgid "Technical support for this plugin"
 msgstr "Техническая поддержка этого плагина"
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:67
+msgid "Only one value in the feature"
+msgstr "У характеристики всего одно значение"

@@ -64,7 +64,7 @@
                					<input type="hidden" name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" value="1" disabled="disabled">
                				{/if}
                				{if $feature.count==1}
-               						<i class="icon16 exclamation"></i><span class="hint">У характеристики всего одно значение</span>
+               						<i class="icon16 exclamation"></i><span class="hint">[`Only one value in the feature`]</span>
                				{/if}
                				<input type="hidden" name="config[features][{$feature.id}][type]" class="fid{$feature.id} ftrs" value="{$feature.multiple}" disabled="disabled">
                				<input type="hidden" name="config[features][{$feature.id}][code]" class="fid{$feature.id} ftrs" value="{$feature.code}" disabled="disabled">

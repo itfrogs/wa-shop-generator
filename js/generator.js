@@ -44,6 +44,14 @@ $.extend($.importexport.plugins, {
             $('#s-plugin-generator-cat').val(name);
             $('#s-plugin-generator-catid').val(category_id);
         },
+        
+        checkFeature: function(cb ,fid){
+    		if($(cb).prop('checked')){
+    			$('.fid'+fid).attr('disabled', false);
+    		}else{
+    			$('.fid'+fid).attr('disabled', true);
+    		}
+    	},
 
         generatorHandler: function (elm) {
             var self = this;
@@ -67,6 +75,8 @@ $.extend($.importexport.plugins, {
                 success: function(response){
                     if(response.error) {
                         self.form.find(':input').prop('disabled', false);
+                        self.form.find('.ftrs').prop('disabled', true);
+                        self.form.find('.fcheck').prop('checked', false);
                         self.form.find(':submit').show();
                         self.form.find('.js-progressbar-container').hide();
                         self.form.find('.shop-ajax-status-loading').remove();
@@ -91,6 +101,8 @@ $.extend($.importexport.plugins, {
                 },
                 error: function () {
                     self.form.find(':input').attr('disabled', false);
+                    self.form.find('.ftrs').prop('disabled', true);
+                    self.form.find('.fcheck').prop('checked', false);
                     self.form.find(':submit').show();
                     self.form.find('.js-progressbar-container').hide();
                     self.form.find('.shop-ajax-status-loading').remove();
@@ -136,6 +148,8 @@ $.extend($.importexport.plugins, {
                             $report.find(".value:first").html(response.report);
                         }
                         self.form.find(':input').prop('disabled', false);
+                        self.form.find('.ftrs').prop('disabled', true);
+                        self.form.find('.fcheck').prop('checked', false);
                         self.form.find(':submit').show();
                         //$.storage.del('shop/hash');
                     }
@@ -144,6 +158,8 @@ $.extend($.importexport.plugins, {
             } else if (response && response.error) {
 
                 self.form.find(':input').attr('disabled', false);
+                self.form.find('.ftrs').prop('disabled', true);
+                self.form.find('.fcheck').prop('checked', false);
                 self.form.find(':submit').show();
                 self.form.find('.js-progressbar-container').hide();
                 self.form.find('.shop-ajax-status-loading').remove();

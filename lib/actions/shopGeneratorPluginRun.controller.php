@@ -59,10 +59,6 @@ class shopGeneratorPluginRunController extends waLongActionController
             );
             $robohash = new shopGeneratorPluginRobohash($robohash_options);
             
-            $mf = new shopFeatureModel();
-            $fvalues = array_keys($mf->getFeatureValues($mf->getByCode('razmer_k_')));
-            
-
             $this->data += array(
                 'timestamp'         => time(),
                 'count'             => intval($options['config']['num']),
@@ -291,7 +287,6 @@ class shopGeneratorPluginRunController extends waLongActionController
                 $product->base_price_selectable = $product->price;
                 $product->features_selectable = $fselectable;
                 $product->sku_id = null;
-//                wa_dump($fselectable);
             }
             if(isset($fsimple)){
                 $product->features = $fsimple;

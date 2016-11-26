@@ -9,13 +9,6 @@
     <form action="?plugin=generator&module=run" id="s-plugin-generator" method="post">
         <div class="fields form">
             <div class="field">
-                <div class="name">[`Category for generating products`]</div>
-                <div class="value">
-                    <input id="s-plugin-generator-cat"  class="long" type="text" readonly="readonly" value="[`Select a category`]">
-                </div>
-                <input id="s-plugin-generator-catid" type="hidden" name="config[category_id]" value="0">
-            </div>
-            <div class="field">
                 <div class="name">[`Prefix the name of the product`]</div>
                 <div class="value">
                     <input class="long" type="text" name="config[prefix]" value="[`Product`]">
@@ -45,8 +38,50 @@
                     <input class="long" type="text" name="config[images_num]" value="1">
                 </div>
             </div>
-
+			<hr>
+			{if $features && count($features) > 0}
+				<div class="field">
+                	<div class="name">Характеристики товаров</div>
+	                <div class="value">
+    	                <span>Укажите случайные значения каких характеристик присвоить создаваемым товарам. Если характеристика является характеристикой со множественным выбором - так же укажите количество присваиваемых значений.</span>
+        	        </div>
+                	{foreach $features as $feature}
+               			<div class="value">
+               				<input type="checkbox" class="fcheck" onclick="$.importexport.plugins.generator.checkFeature(this, {$feature.id})" {if $feature.count==0}disabled="disabled"{/if}>
+               				<input class="fid{$feature.id} ftrs" name="config[features][{$feature.id}][name]" type="text" readonly="readonly" value="{$feature.name}" disabled="disabled">
+               				{if $feature.multiple == 1}
+               					{if $feature.count/2 >10}
+               						{$cmax = 10}
+               					{else}
+               						{$cmax = ceil($feature.count/2)}
+               					{/if}
+               					<select name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" disabled="disabled">
+               						{for $c=1; $c!=$cmax; $c++}
+               							<option value="{$c}">{$c}</option>
+               						{/for}
+               					</select>
+               				{else}
+               					<input type="hidden" name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" value="1" disabled="disabled">
+               				{/if}
+               				{if $feature.count==1}
+               						<i class="icon16 exclamation"></i><span class="hint">У характеристики всего одно значение</span>
+               				{/if}
+               				<input type="hidden" name="config[features][{$feature.id}][type]" class="fid{$feature.id} ftrs" value="{$feature.multiple}" disabled="disabled">
+               				<input type="hidden" name="config[features][{$feature.id}][code]" class="fid{$feature.id} ftrs" value="{$feature.code}" disabled="disabled">
+               			</div>
+                	{/foreach}
+            	</div>
+			{/if}
+			<hr>
             <!-- categories -->
+            <div class="field">
+                <div class="name">[`Category for generating products`]</div>
+                <div class="value">
+                    <input id="s-plugin-generator-cat"  class="long" type="text" readonly="readonly" value="[`Select a category`]">
+                </div>
+                <input id="s-plugin-generator-catid" type="hidden" name="config[category_id]" value="0">
+            </div>
+            
             <br>
             <div class="block drop-target" id="s-category-list-block">
                 <div class="hierarchical s-collection-list" id="s-category-list">

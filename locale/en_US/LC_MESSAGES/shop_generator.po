@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "Language: en_US\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: .\n"
@@ -81,9 +81,7 @@ msgid "The plugin generates a specified number of products in category."
 msgstr ""
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:64
-msgid ""
-"Do not close the browser window and not leave the page as long as the "
-"process is completed"
+msgid "Do not close the browser window and not leave the page as long as the process is completed"
 msgstr ""
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:39
@@ -132,4 +130,20 @@ msgstr ""
 
 #: /wa-apps/shop/plugins/generator/lib/config/requirements.php:9
 msgid "This extension is used for computing"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:44
+msgid "Product features"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:46
+msgid "Enter random values assigned to some features of created goods. If the feature is a characteristic with multiple choice - just specify the number of assigned values."
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/feedbackControl.html:9
+msgid "Technical support for this plugin"
+msgstr ""
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:67
+msgid "Only one value in the feature"
 msgstr ""

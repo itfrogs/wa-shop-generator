@@ -41,34 +41,36 @@
 			<hr>
 			{if $features && count($features) > 0}
 				<div class="field">
-                	<div class="name">Характеристики товаров</div>
+                	<div class="name">[`Product features`]</div>
 	                <div class="value">
-    	                <span>Укажите случайные значения каких характеристик присвоить создаваемым товарам. Если характеристика является характеристикой со множественным выбором - так же укажите количество присваиваемых значений.</span>
+    	                <span>[`Enter random values assigned to some features of created goods. If the feature is a characteristic with multiple choice - just specify the number of assigned values.`]</span>
         	        </div>
                 	{foreach $features as $feature}
-               			<div class="value">
-               				<input type="checkbox" class="fcheck" onclick="$.importexport.plugins.generator.checkFeature(this, {$feature.id})" {if $feature.count==0}disabled="disabled"{/if}>
-               				<input class="fid{$feature.id} ftrs" name="config[features][{$feature.id}][name]" type="text" readonly="readonly" value="{$feature.name}" disabled="disabled">
-               				{if $feature.multiple == 1}
-               					{if $feature.count/2 >10}
-               						{$cmax = 10}
+                		{if $feature.count > 0}
+	               			<div class="value">
+    	           				<input type="checkbox" class="fcheck" onclick="$.importexport.plugins.generator.checkFeature(this, {$feature.id})" {if $feature.count==0}disabled="disabled"{/if}>
+        	       				<input class="fid{$feature.id} ftrs" name="config[features][{$feature.id}][name]" type="text" readonly="readonly" value="{$feature.name}" disabled="disabled">
+            	   				{if $feature.multiple == 1}
+               						{if $feature.count/2 >10}
+               							{$cmax = 10}
+               						{else}
+               							{$cmax = ceil($feature.count/2+1)}
+               						{/if}
+	               					<select name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" disabled="disabled">
+    	           						{for $c=1; $c!=$cmax; $c++}
+        	       							<option value="{$c}">{$c}</option>
+            	   						{/for}
+               						</select>
                					{else}
-               						{$cmax = ceil($feature.count/2)}
+               						<input type="hidden" name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" value="1" disabled="disabled">
                					{/if}
-               					<select name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" disabled="disabled">
-               						{for $c=1; $c!=$cmax; $c++}
-               							<option value="{$c}">{$c}</option>
-               						{/for}
-               					</select>
-               				{else}
-               					<input type="hidden" name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" value="1" disabled="disabled">
-               				{/if}
-               				{if $feature.count==1}
-               						<i class="icon16 exclamation"></i><span class="hint">У характеристики всего одно значение</span>
-               				{/if}
-               				<input type="hidden" name="config[features][{$feature.id}][type]" class="fid{$feature.id} ftrs" value="{$feature.multiple}" disabled="disabled">
-               				<input type="hidden" name="config[features][{$feature.id}][code]" class="fid{$feature.id} ftrs" value="{$feature.code}" disabled="disabled">
-               			</div>
+	               				{if $feature.count==1}
+    	           						<i class="icon16 exclamation"></i><span class="hint">[`Only one value in the feature`]</span>
+        	       				{/if}
+            	   				<input type="hidden" name="config[features][{$feature.id}][type]" class="fid{$feature.id} ftrs" value="{$feature.multiple}" disabled="disabled">
+               					<input type="hidden" name="config[features][{$feature.id}][code]" class="fid{$feature.id} ftrs" value="{$feature.code}" disabled="disabled">
+               				</div>
+               			{/if}
                 	{/foreach}
             	</div>
 			{/if}

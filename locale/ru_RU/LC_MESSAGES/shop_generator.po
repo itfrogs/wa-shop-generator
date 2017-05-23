@@ -8,17 +8,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n"
-"%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
+"Plural-Forms: nplurals=3; plural=((((n%10)==1)&&((n%100)!=11))?(0):(((((n%10)>=2)&&((n%10)<=4))&&(((n%100)<10)||((n%100)>=20)))?(1):2));\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: .\n"
 "Language: ru_RU\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: .\n"
 
-#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:3
-#: /wa-apps/shop/plugins/generator/lib/config/plugin.php:3
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:3 /wa-apps/shop/plugins/generator/lib/config/plugin.php:3
 msgid "Products generator"
 msgstr "Генератор товаров"
 
@@ -80,16 +78,11 @@ msgstr "Высота изображения товара"
 
 #: /wa-apps/shop/plugins/generator/lib/config/plugin.php:4
 msgid "The plugin generates a specified number of products in category."
-msgstr ""
-"Плагин генерирует определенное количество товаров в заданной категории."
+msgstr "Плагин генерирует определенное количество товаров в заданной категории."
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:64
-msgid ""
-"Do not close the browser window and not leave the page as long as the "
-"process is completed"
-msgstr ""
-"Не закрывайте окно браузера и не покидайте страницу до тех пор, пока процесс "
-"не будет завершен"
+msgid "Do not close the browser window and not leave the page as long as the process is completed"
+msgstr "Не закрывайте окно браузера и не покидайте страницу до тех пор, пока процесс не будет завершен"
 
 #: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:39
 msgid "Number of images for each product"
@@ -138,3 +131,21 @@ msgstr "Перейдите по ссылке, чтобы связаться с �
 #: /wa-apps/shop/plugins/generator/lib/config/requirements.php:9
 msgid "This extension is used for computing"
 msgstr "Расшрение, которое используется для вычислений"
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:44
+msgid "Product features"
+msgstr "Характеристики товара"
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:46
+msgid "Enter random values assigned to some features of created goods. If the feature is a characteristic with multiple choice - just specify the number of assigned values."
+msgstr ""
+"Укажите случайные значения каких характеристик присвоить создаваемым товарам. Если характеристика является характеристикой со множественным выбором - так же укажите "
+"количество присваиваемых значений."
+
+#: /wa-apps/shop/plugins/generator/templates/feedbackControl.html:9
+msgid "Technical support for this plugin"
+msgstr "Техническая поддержка этого плагина"
+
+#: /wa-apps/shop/plugins/generator/templates/actions/backend/Setup.html:67
+msgid "Only one value in the feature"
+msgstr "У характеристики всего одно значение"

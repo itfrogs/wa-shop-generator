@@ -295,7 +295,7 @@ class shopGeneratorPluginRunController extends waLongActionController
             if(isset($fselectable)){
                 $ms->updateByField('product_id', $product->getId(), array('price' => $product->base_price_selectable));
                 $ms->deleteById($sku_id);
-                $product->sku_count -= 1; 
+                $product->setData('sku_count', $product->sku_count - 1);
                 $p_skus = array_keys($ms->getDataByProductId($product->getId()));
                 $product->sku_id = $p_skus[0];
                 $product->save();

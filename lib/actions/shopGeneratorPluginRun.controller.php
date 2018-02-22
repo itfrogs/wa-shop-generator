@@ -156,22 +156,24 @@ class shopGeneratorPluginRunController extends waLongActionController
         
         $i = $this->data['images_num'] - $this->data['images_count'];
 
-        $this->data['images'][$i]['name'] = 'image'.$i.'.png';
-        $this->data['images'][$i]['tmp_path'] = $wa->getDataPath('plugins/generator/'.$this->data['images'][$i]['name'], true, 'shop', true);
-        $options = array(
-            'text'          => $data['url'].$this->data['images'][$i]['name'],
-            'set_dirs'      => $this->data['set_dirs'],
-            'bg_dirs'       => $this->data['bg_dirs'],
-            'width'         => $settings['image_width'],
-            'height'        => $settings['image_height'],
-        );
-        $robohash = new shopGeneratorPluginRobohash($options);
+        if ($i > 0) {
+            $this->data['images'][$i]['name'] = 'image'.$i.'.png';
+            $this->data['images'][$i]['tmp_path'] = $wa->getDataPath('plugins/generator/'.$this->data['images'][$i]['name'], true, 'shop', true);
+            $options = array(
+                'text'          => $data['url'].$this->data['images'][$i]['name'],
+                'set_dirs'      => $this->data['set_dirs'],
+                'bg_dirs'       => $this->data['bg_dirs'],
+                'width'         => $settings['image_width'],
+                'height'        => $settings['image_height'],
+            );
+            $robohash = new shopGeneratorPluginRobohash($options);
 
-        $im = $robohash->generate();
-        if (!empty($im)) {
-            waFiles::move($temp_image_path, $this->data['images'][$i]['tmp_path']);
+            $im = $robohash->generate();
+            if (!empty($im)) {
+                waFiles::move($temp_image_path, $this->data['images'][$i]['tmp_path']);
+            }
+            $this->data['images_count']--;
         }
-        $this->data['images_count']--;
 
         if ($this->data['images_count'] < 1) {
             $product = new shopProduct();
@@ -244,6 +246,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                 $sku['price'] = $price;
                 $sku['primary_price'] = $price;
                 $sku['available'] = 1;
+                $sku['sku'] = uniqid();
                 $sku_model->updateById($sku['id'], $sku);
             }
             else {

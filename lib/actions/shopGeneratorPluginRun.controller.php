@@ -116,7 +116,7 @@ class shopGeneratorPluginRunController extends waLongActionController
         $lipsum = array_slice($lipsum, 0, rand(1, count($lipsum) - 1));
         return implode(' ', $lipsum);
     }
-    
+
     /**
      * Performs a small piece of work.
      * Runs inside a transaction ($this->data and $this->fd are accessible).
@@ -127,7 +127,9 @@ class shopGeneratorPluginRunController extends waLongActionController
      * 5-10% of max execution time is recommended.
      *
      * $this->getStorage() session is already closed.
-     * @return boolean false to end this Runner and call info(); true to continue.
+     * @return bool
+     * @throws Exception
+     * @throws waException
      */
     protected function step()
     {
@@ -153,10 +155,11 @@ class shopGeneratorPluginRunController extends waLongActionController
             'count' => null,
             'currency' => $this->config->getCurrency(true),
         );
-        
+
         $i = $this->data['images_num'] - $this->data['images_count'];
 
-        if ($i > 0) {
+        if ($this->data['images_num'] > 0) {
+
             $this->data['images'][$i]['name'] = 'image'.$i.'.png';
             $this->data['images'][$i]['tmp_path'] = $wa->getDataPath('plugins/generator/'.$this->data['images'][$i]['name'], true, 'shop', true);
             $options = array(
@@ -194,9 +197,10 @@ class shopGeneratorPluginRunController extends waLongActionController
             foreach ($this->data['images'] as $j => $im) {
                 $image = waImage::factory($im['tmp_path']);
 
-                if (!file_exists($im['tmp_path']) || !$image) {
+                if ($this->data['images_num'] > 0 && (!file_exists($im['tmp_path']) || !$image)) {
                     $spm = new shopProductModel();
                     $spm->deleteById($product->getId());
+                    continue;
                 }
                 else {
                     $img = array(
@@ -236,8 +240,6 @@ class shopGeneratorPluginRunController extends waLongActionController
             else {
                 $this->data['processed_count'] = 0;
             }
-
-
 
             $sku_model = new shopProductSkusModel();
 

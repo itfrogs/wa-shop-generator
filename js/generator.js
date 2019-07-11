@@ -15,6 +15,12 @@ $.extend($.importexport.plugins, {
             $.shop.trace('init data', data);
             this.$form = $('#s-plugin-generator');
             $.extend(this.data, data);
+
+            $('.type select', this.$form).on('change', function () {
+                var $features = $('.feature', this.$form);
+                $features.hide();
+                $features.filter('.feature-type' + $(this).val()).show();
+            }).trigger('change');
         },
 
         action: function () {
@@ -44,7 +50,7 @@ $.extend($.importexport.plugins, {
             $('#s-plugin-generator-cat').val(name);
             $('#s-plugin-generator-catid').val(category_id);
         },
-        
+
         checkFeature: function(cb ,fid){
     		if($(cb).prop('checked')){
     			$('.fid'+fid).attr('disabled', false);

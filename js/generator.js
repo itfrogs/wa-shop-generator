@@ -17,8 +17,7 @@ $.extend($.importexport.plugins, {
             $.extend(this.data, data);
 
             $('.type select', this.$form).on('change', function () {
-                var $features = $('.feature', this.$form);
-                $features.hide().filter('.feature-type' + $(this).val()).show();
+                $('.feature', this.$form).hide().filter('.feature-type' + $(this).val()).show();
             }).trigger('change');
         },
 

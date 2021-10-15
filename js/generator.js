@@ -18,8 +18,7 @@ $.extend($.importexport.plugins, {
 
             $('.type select', this.$form).on('change', function () {
                 var $features = $('.feature', this.$form);
-                $features.hide();
-                $features.filter('.feature-type' + $(this).val()).show();
+                $features.hide().filter('.feature-type' + $(this).val()).show();
             }).trigger('change');
         },
 
@@ -29,7 +28,7 @@ $.extend($.importexport.plugins, {
         onInit: function () {
             $.importexport.products.init(this.$form);
 
-            this.$form.unbind('submit.generator').bind('submit.generator', function (evt) {
+            this.$form.unbind('submit.generator').on('submit.generator', function (evt) {
                 $.shop.trace('submit.generator ' + evt.namespace, evt);
                 $.importexport.plugins.generator.generatorHandler(this);
                 return false;
@@ -37,11 +36,7 @@ $.extend($.importexport.plugins, {
         },
 
         actionHandler: function (elm) {
-
             $.shop.trace('actionHadler arg', elm);
-            //$.shop.trace('actionHadler args', args);
-            //$.shop.trace('actionHandler getMethod')
-
             return false;
         },
 

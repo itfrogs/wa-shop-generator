@@ -14,22 +14,16 @@
                     <input class="long" type="text" name="config[prefix]" value="[`Product`]">
                 </div>
             </div>
-            <div class="field">
+            <div class="field type">
                 <div class="name">[`Type of products`]</div>
                 <div class="value">
-                    <select name="config[type_id]">
-                        {foreach $product_types as $id=>$type}
-                            <option value="{$id}">
-                                {$type.name|escape}
-                            </option>
-                        {/foreach}
-                    </select>
+                    {html_options name='config[type_id]' options=array_column($product_types, 'name', 'id')}
                 </div>
             </div>
             <div class="field">
                 <div class="name">[`Number of products generated`]</div>
                 <div class="value">
-                    <input class="long" type="text" name="config[num]" value="0">
+                    <input class="long" type="text" name="config[num]" value="1">
                 </div>
             </div>
             <div class="field">
@@ -38,44 +32,38 @@
                     <input class="long" type="text" name="config[images_num]" value="1">
                 </div>
             </div>
-			<hr>
-			{if $features && count($features) > 0}
-				<div class="field">
-                	<div class="name">[`Product features`]</div>
-	                <div class="value">
-    	                <span>[`Enter random values assigned to some features of created goods. If the feature is a characteristic with multiple choice - just specify the number of assigned values.`]</span>
-        	        </div>
-                	{foreach $features as $feature}
-                		{if $feature.count > 0}
-	               			<div class="value">
-    	           				<input type="checkbox" class="fcheck" onclick="$.importexport.plugins.generator.checkFeature(this, {$feature.id})" {if $feature.count==0}disabled="disabled"{/if}>
-        	       				<input class="fid{$feature.id} ftrs" name="config[features][{$feature.id}][name]" type="text" readonly="readonly" value="{$feature.name}" disabled="disabled">
-            	   				{if $feature.multiple == 1}
-               						{if $feature.count/2 >10}
-               							{$cmax = 10}
-               						{else}
-               							{$cmax = ceil($feature.count/2+1)}
-               						{/if}
-	               					<select name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" disabled="disabled">
-    	           						{for $c=1; $c!=$cmax; $c++}
-        	       							<option value="{$c}">{$c}</option>
-            	   						{/for}
-               						</select>
-               					{else}
-               						<input type="hidden" name="config[features][{$feature.id}][count]" class="fid{$feature.id} ftrs" value="1" disabled="disabled">
-               					{/if}
-	               				{if $feature.count==1}
-    	           						<i class="icon16 exclamation"></i><span class="hint">[`Only one value in the feature`]</span>
-        	       				{/if}
-            	   				<input type="hidden" name="config[features][{$feature.id}][type]" class="fid{$feature.id} ftrs" value="{$feature.multiple}" disabled="disabled">
-               					<input type="hidden" name="config[features][{$feature.id}][code]" class="fid{$feature.id} ftrs" value="{$feature.code}" disabled="disabled">
-               				</div>
-               			{/if}
-                	{/foreach}
-            	</div>
+            <hr>
+{if $features && count($features) > 0}
+            <div class="field">
+		<div class="name">[`Product features`]</div>
+		<div class="value">
+			<span>[`Enter random values assigned to some features of created goods. If the feature is a characteristic with multiple choice - just specify the number of assigned values.`]</span>
+	        </div>
+	{foreach $features as $fid => $feature}
+		{if $feature.count}
+			<div class="value feature feature-type{implode(' feature-type', $feature_types[$fid])}">
+				<input type="checkbox" class="fcheck" onclick="$.importexport.plugins.generator.checkFeature(this, {$fid})"{if !$feature.count} disabled="disabled"{/if}>
+				<input class="fid{$fid} ftrs" name="config[features][{$fid}][name]" type="text" readonly="readonly" value="{$feature.name}" disabled="disabled">
+			{if $feature.multiple}
+				<select name="config[features][{$fid}][count]" class="fid{$fid} ftrs" disabled="disabled">
+					{$range = range(1, min($feature.count, 10))}
+					{html_options output=$range values=$range}
+				</select>
+			{else}
+				<input type="hidden" name="config[features][{$fid}][count]" class="fid{$fid} ftrs" value="1" disabled="disabled">
 			{/if}
-			<hr>
-            <!-- categories -->
+			{if $feature.count == 1}
+				<i class="icon16 exclamation"></i><span class="hint">[`Only one value in the feature`]</span>
+			{/if}
+				<input type="hidden" name="config[features][{$fid}][type]" class="fid{$fid} ftrs" value="{$feature.multiple}" disabled="disabled">
+				<input type="hidden" name="config[features][{$fid}][code]" class="fid{$fid} ftrs" value="{$feature.code}" disabled="disabled">
+			</div>
+		{/if}
+	{/foreach}
+	</div>
+{/if}
+	<hr>
+	<!-- categories -->
             <div class="field">
                 <div class="name">[`Category for generating products`]</div>
                 <div class="value">
@@ -83,11 +71,11 @@
                 </div>
                 <input id="s-plugin-generator-catid" type="hidden" name="config[category_id]" value="0">
             </div>
-            
+
             <br>
             <div class="block drop-target" id="s-category-list-block">
                 <div class="hierarchical s-collection-list" id="s-category-list">
-                    {include './include.categories.html' categories=$categories->getList() inline}
+                    {include './include.categories.html' categories=$categories inline}
                 </div>
             </div>
 
@@ -118,7 +106,7 @@
                 </div>
             </div>
 
-            <div class="field-group" id="plugin-generator-report" style="display: none">
+            <div class="field-group" id="plugin-generator-report" style="display:none">
                 <div class="field">
                     <div class="value"></div>
                 </div>
@@ -128,11 +116,17 @@
     </form>
 
 </div>
-<script type="text/javascript">
-    if($.importexport.plugins.generator) {
+<script>
+$(function () {
+    if ($.importexport.plugins.generator) {
         $.importexport.plugins.generator.init();
+    } else {
+        $.getScript(
+          '{$wa_app_static_url}plugins/generator/js/generator.min.js',
+          function() {
+            $.importexport.plugins.generator.init();
+          }
+        );
     }
-    else {
-        $.getScript('{$wa_app_static_url}plugins/generator/js/generator.js', function(){ $.importexport.plugins.generator.init() });
-    }
+});
 </script>

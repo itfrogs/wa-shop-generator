@@ -10,13 +10,18 @@ class shopGeneratorPluginBackendActions extends waViewActions
      */
     public function setupAction()
     {
-        $type_model = new shopTypeModel();
-        $feature_model = new shopFeatureModel();
-        $product_types = $type_model->getTypes(true);
-        $features = $feature_model->where('type NOT IN ("2d.double","3d.double","divider","text") AND parent_id IS NULL')->fetchAll();
-        $this->view->assign('product_types', $product_types);
-        $this->view->assign('categories', new shopCategories());
+        $features = wao(new shopFeatureModel)
+            ->where('type NOT LIKE "_d.%" AND type NOT IN ("divider", "text")')
+            ->where('parent_id IS NULL')
+            ->fetchAll('id');
         $this->view->assign('features', $features);
+        $feature_types = (new shopTypeFeaturesModel)
+            ->select('type_id, feature_id')
+            ->where('feature_id IN (?)', [array_keys($features)])
+            ->fetchAll('feature_id', 2);
+        $this->view->assign('feature_types', $feature_types);
+        $this->view->assign('product_types', wao(new shopTypeModel)->getTypes(true));
+        $this->view->assign('categories', wao(new shopCategories())->getList());
     }
 
     /**

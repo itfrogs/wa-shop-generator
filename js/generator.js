@@ -15,6 +15,10 @@ $.extend($.importexport.plugins, {
             $.shop.trace('init data', data);
             this.$form = $('#s-plugin-generator');
             $.extend(this.data, data);
+
+            $('.type select', this.$form).on('change', function () {
+                $('.feature', this.$form).hide().filter('.feature-type' + $(this).val()).show();
+            }).trigger('change');
         },
 
         action: function () {
@@ -23,7 +27,7 @@ $.extend($.importexport.plugins, {
         onInit: function () {
             $.importexport.products.init(this.$form);
 
-            this.$form.unbind('submit.generator').bind('submit.generator', function (evt) {
+            this.$form.unbind('submit.generator').on('submit.generator', function (evt) {
                 $.shop.trace('submit.generator ' + evt.namespace, evt);
                 $.importexport.plugins.generator.generatorHandler(this);
                 return false;
@@ -31,11 +35,7 @@ $.extend($.importexport.plugins, {
         },
 
         actionHandler: function (elm) {
-
             $.shop.trace('actionHadler arg', elm);
-            //$.shop.trace('actionHadler args', args);
-            //$.shop.trace('actionHandler getMethod')
-
             return false;
         },
 
@@ -44,7 +44,7 @@ $.extend($.importexport.plugins, {
             $('#s-plugin-generator-cat').val(name);
             $('#s-plugin-generator-catid').val(category_id);
         },
-        
+
         checkFeature: function(cb ,fid){
     		if($(cb).prop('checked')){
     			$('.fid'+fid).attr('disabled', false);

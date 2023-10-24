@@ -283,7 +283,7 @@ class shopGeneratorPluginRunController extends waLongActionController
                 'category_id' => $data['category_id'],
                 'sort' => 0,
             );
-            $scp->insert($category_product);
+            $scp->insert($category_product, 1);
             $category_model->query('UPDATE shop_category SET count = count + 1 WHERE id = i:category_id', array('category_id' => $data['category_id']));
 
             foreach ($this->data['images'] as $i => $im) {

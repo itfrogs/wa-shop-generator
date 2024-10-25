@@ -2,6 +2,7 @@ $.extend($.importexport.plugins, {
     generator: {
         $form: null,
         progress: false,
+        ui: 1.3,
         ajax_pull: {},
         data: {
             params: {}
@@ -10,10 +11,10 @@ $.extend($.importexport.plugins, {
             'memory': 0.0,
             'memory_avg': 0.0
         },
-
         init: function (data) {
             $.shop.trace('init data', data);
             this.$form = $('#s-plugin-generator');
+            //this.data.ui = this.ui;
             $.extend(this.data, data);
 
             $('.type select', this.$form).on('change', function () {
@@ -124,17 +125,26 @@ $.extend($.importexport.plugins, {
                         clearTimeout(timer);
                     }
                 }
-                $bar = self.form.find('.progressbar .progressbar-inner');
+                //$bar = self.form.find('.progressbar .progressbar-inner');
+                if (parseFloat(self.ui) < 2) {
+                    $bar = self.form.find('.progressbar .progressbar-inner');
+                }
+                else {
+                    $bar = self.form.find('.progressbar-line-wrapper .progressbar-inner');
+                }
                 $bar.css({
                     'width': '100%'
                 });
+                $('.progressbar-inner').css('width', '100%');
+                $('.progressbar-text').html('100%');
+                //console.log('finish');
                 $.shop.trace('cleanup', response.processId);
-
 
                 $.ajax({
                     url: url,
                     data: {
                         'processId': response.processId,
+                        'data': self.data,
                         'cleanup': 1
                     },
                     dataType: 'json',
@@ -169,11 +179,20 @@ $.extend($.importexport.plugins, {
             } else {
                 var $description;
                 if (response && (typeof(response.progress) != 'undefined')) {
-                    $bar = self.form.find('.progressbar .progressbar-inner');
+                    if (parseFloat(self.ui) < 2) {
+                        $bar = self.form.find('.progressbar .progressbar-inner');
+                    }
+                    else {
+                        $bar = self.form.find('.progressbar-line-wrapper .progressbar-inner');
+                    }
+
                     var progress = parseFloat(response.progress.replace(/,/, '.'));
-                    $bar.animate({
+                    console.log($bar);
+                    console.log(progress);
+                    $bar.css({
                         'width': progress + '%'
                     });
+                    $('.progressbar-text').html(progress + '%');
                     self.debug.memory = Math.max(0.0, self.debug.memory, parseFloat(response.memory) || 0);
                     self.debug.memory_avg = Math.max(0.0, self.debug.memory_avg, parseFloat(response.memory_avg) || 0);
 
@@ -200,7 +219,8 @@ $.extend($.importexport.plugins, {
                     $.ajax({
                         url: ajax_url,
                         data: {
-                            'processId': id
+                            'processId': id,
+                            'data': self.data,
                         },
                         dataType: 'json',
                         type: 'post',

@@ -36,38 +36,30 @@
             {if $features && count($features) > 0}
                 <div class="field">
                     <div class="name">[`Product features`]</div>
-                    <ul>
-                        {foreach $features as $fid => $feature}
-                            {if $feature.count}
-                                <li class="feature feature-type{implode(' feature-type', $feature_types[$fid])}">
-                                    <input type="checkbox" class="fcheck" onclick="$.importexport.plugins.generator.checkFeature(this, {$fid})"{if !$feature.count} disabled="disabled"{/if}>
-                                    <input class="fid{$fid} ftrs" name="config[features][{$fid}][name]" type="text" readonly="readonly" value="{$feature.name}" disabled="disabled">
-                                    {if $feature.multiple}
-                                        <select name="config[features][{$fid}][count]" class="fid{$fid} ftrs" disabled="disabled">
-                                            {$range = range(1, min($feature.count, 10))}
-                                            {html_options output=$range values=$range}
-                                        </select>
-                                    {else}
-                                        <input type="hidden" name="config[features][{$fid}][count]" class="fid{$fid} ftrs" value="1" disabled="disabled">
-                                    {/if}
-                                    {if $feature.count == 1}
-                                        <i class="icon16 exclamation"></i><span class="hint">[`Only one value in the feature`]</span>
-                                    {/if}
-                                    <input type="hidden" name="config[features][{$fid}][type]" class="fid{$fid} ftrs" value="{$feature.multiple}" disabled="disabled">
-                                    <input type="hidden" name="config[features][{$fid}][code]" class="fid{$fid} ftrs" value="{$feature.code}" disabled="disabled">
-                                </li>
-                            {/if}
-                        {/foreach}
-                    </ul>
-
-                </div>
-                <div class="field">
-                    <div class="name"></div>
                     <div class="value">
-                        <p class="hint ">
-                            <span>[`Enter random values assigned to some features of created goods. If the feature is a characteristic with multiple choice - just specify the number of assigned values.`]</span>
-                        </p>
+                        <span>[`Enter random values assigned to some features of created goods. If the feature is a characteristic with multiple choice - just specify the number of assigned values.`]</span>
                     </div>
+                    {foreach $features as $fid => $feature}
+                        {if $feature.count}
+                            <div class="value feature feature-type{implode(' feature-type', $feature_types[$fid])}">
+                                <input type="checkbox" class="fcheck" onclick="$.importexport.plugins.generator.checkFeature(this, {$fid})"{if !$feature.count} disabled="disabled"{/if}>
+                                <input class="fid{$fid} ftrs" name="config[features][{$fid}][name]" type="text" readonly="readonly" value="{$feature.name}" disabled="disabled">
+                                {if $feature.multiple}
+                                    <select name="config[features][{$fid}][count]" class="fid{$fid} ftrs" disabled="disabled">
+                                        {$range = range(1, min($feature.count, 10))}
+                                        {html_options output=$range values=$range}
+                                    </select>
+                                {else}
+                                    <input type="hidden" name="config[features][{$fid}][count]" class="fid{$fid} ftrs" value="1" disabled="disabled">
+                                {/if}
+                                {if $feature.count == 1}
+                                    <i class="icon16 exclamation"></i><span class="hint">[`Only one value in the feature`]</span>
+                                {/if}
+                                <input type="hidden" name="config[features][{$fid}][type]" class="fid{$fid} ftrs" value="{$feature.multiple}" disabled="disabled">
+                                <input type="hidden" name="config[features][{$fid}][code]" class="fid{$fid} ftrs" value="{$feature.code}" disabled="disabled">
+                            </div>
+                        {/if}
+                    {/foreach}
                 </div>
             {/if}
             <hr>
@@ -89,23 +81,28 @@
             </div>
 
 
-
             <div class="field-group" id="plugin-generator-submit">
                 <div class="field">
-                    <div class="value">
+                    <div class="value submit">
                         <button type="submit" class="button green">[`Start`]</button>
                         <br><br>
-                        <div class="progressbar">
-                            <div class="progressbar-line-wrapper text-inside">
+                        <div class="js-progressbar-container" style="display:none">
+                            <div class="progressbar blue float-left" style="display:none;width:70%">
                                 <div class="progressbar-outer">
-                                    <div class="progressbar-inner" style="width: 0%;">
-                                        <div class="progressbar-text">0%</div>
-                                    </div>
+                                    <div class="progressbar-inner" style="width:0"></div>
                                 </div>
                             </div>
+                            <img src="{$wa_url}wa-content/img/loading32.gif" alt="Loading" style="float:left;margin-top:8px">
+                            <div class="clear"></div>
+                            <span class="progressbar-description"></span>
+                            <br style="clear:left"><br>
+                            <span class="small italic">
+                                [`Do not close the browser window and not leave the page as long as the process is completed`]
+                            </span>
                         </div>
                         <br><br>
                         <em class="errormsg"></em>
+
                     </div>
                 </div>
             </div>
@@ -125,7 +122,6 @@
         if ($.importexport.plugins.generator) {
             $.importexport.plugins.generator.ui = {$ui};
             $.importexport.plugins.generator.init();
-
         } else {
             $.getScript(
                 '{$wa_app_static_url}plugins/generator/js/generator.min.js',

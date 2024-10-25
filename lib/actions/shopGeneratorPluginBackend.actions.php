@@ -22,6 +22,15 @@ class shopGeneratorPluginBackendActions extends waViewActions
         $this->view->assign('feature_types', $feature_types);
         $this->view->assign('product_types', wao(new shopTypeModel)->getTypes(true));
         $this->view->assign('categories', wao(new shopCategories())->getList());
+
+        $plugin = wa('shop')->getPlugin('generator');
+        $this->view->assign('ui', wa('shop')->whichUI());
+
+        if(wa('shop')->whichUI() === '1.3') {
+            $this->setTemplate($plugin->getPluginPath() . '/templates/actions-legacy/backend/Setup.html');
+        }else{
+            $this->setTemplate($plugin->getPluginPath() . '/templates/actions/backend/Setup.html');
+        }
     }
 
     /**

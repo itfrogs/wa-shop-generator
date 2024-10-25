@@ -60,7 +60,7 @@ class shopGeneratorPluginRobohash
         }
         else {
             if ($settings['background']) {
-                $this->set_bgset(self::$bgsets[bcmod($this->hash_list[2], count(self::$bgsets))]);
+                $this->set_bgset(self::$bgsets[$this->my_bcmod($this->hash_list[2], count(self::$bgsets))]);
             }
         }
 
@@ -103,7 +103,7 @@ class shopGeneratorPluginRobohash
             $this->set .= $color;
         }
         else {
-            $this->set .= self::$colors[bcmod($this->hash_list[0], count(self::$colors))] ;
+            $this->set .= self::$colors[$this->my_bcmod($this->hash_list[0], count(self::$colors))] ;
         }
     }
 
@@ -111,7 +111,7 @@ class shopGeneratorPluginRobohash
     {
         if ($set == 'any') 
         {
-            $set = self::$sets[bcmod($this->hash_list[1], count(self::$sets))] ;
+            $set = self::$sets[$this->my_bcmod($this->hash_list[1], count(self::$sets))] ;
         }
         if ($set == 'set1' || !in_array($set, self::$sets))
         {
@@ -124,7 +124,7 @@ class shopGeneratorPluginRobohash
     {
         if (!in_array($bgset, self::$bgsets))
         {
-            $bgset = self::$bgsets[bcmod($this->hash_list[2], count(self::$bgsets))];
+            $bgset = self::$bgsets[$this->my_bcmod($this->hash_list[2], count(self::$bgsets))];
         }
 
         if (!empty($this->bgsets_array)) {
@@ -139,7 +139,7 @@ class shopGeneratorPluginRobohash
             $bgfiles = glob($this->image_dir . "$bgset/*");
         }
 
-        $this->bgset = $bgfiles[bcmod($this->hash_list[3], count($bgfiles))];
+        $this->bgset = $bgfiles[$this->my_bcmod($this->hash_list[3], count($bgfiles))];
         return $this->bgset;
     }
 
@@ -191,7 +191,7 @@ class shopGeneratorPluginRobohash
         {
             //$files = glob("$dir/*");
             $files = $dir;
-            $img_index = bcmod($this->hash_list[$this->hash_index], count($files));
+            $img_index = $this->my_bcmod($this->hash_list[$this->hash_index], count($files));
             $this->hash_index++;
             $s = explode('#', $files[$img_index], 2);
             krsort($s);
@@ -397,5 +397,28 @@ class shopGeneratorPluginRobohash
 
     public function deleteTempImage() {
         waFiles::delete($this->temp_image);
+    }
+    
+    /**
+     * my_bcmod - get modulus (substitute for bcmod)
+     * string my_bcmod ( string left_operand, int modulus )
+     * left_operand can be really big, but be carefull with modulus :(
+     * by Andrius Baranauskas and Laurynas Butkus :) Vilnius, Lithuania
+     **/
+    private function my_bcmod( $x, $y )
+    {
+        // how many numbers to take at once? carefull not to exceed (int) 
+        $take = 5;
+        $mod = '';
+
+        do
+        {
+            $a = (int)$mod.substr( $x, 0, $take );
+            $x = substr( $x, $take );
+            $mod = $a % $y;
+        }
+        while ( strlen($x) );
+
+        return (int)$mod;
     }
 }
